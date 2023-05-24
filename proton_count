@@ -1,0 +1,56 @@
+int matches = 0;
+
+import org.jlab.jnp.hipo4.io.*;
+import org.jlab.jnp.hipo4.data.*;
+import org.jlab.groot.data.*;
+import org.jlab.groot.graphics.*;
+import org.jlab.groot.math.*;
+import org.jlab.groot.ui.*;
+import org.jlab.clas.physics.*;
+import org.jlab.clas.physics.LorentzVector;
+import org.jlab.clas.physics.PhysicsEvent;
+import org.jlab.clas.physics.Particle;
+import org.jlab.clas.physics.EventFilter;
+HipoReader reader = new HipoReader();
+reader.open("coatjava/bin/SimOuts.hipo");
+
+SchemaFactory factory = reader.getSchemaFactory();
+factory.show();
+Bank particles = new Bank(factory.getSchema("MC::Lund"));
+Event     event = new Event();
+reader.getEvent(event,0);
+
+int counter = 0;
+
+while(reader.hasNext()==true){
+      reader.nextEvent(event);
+      event.read(particles);
+      int electron = 0;
+      int proton =0;
+      if(particles.getRows()>4){ 
+          counter++;
+          for(int row = 0; row < particles.getRows(); row++){
+              int pid = particles.getInt("pid",row);
+              if(pid == 11)  { 
+                  electron++;
+              }
+              if(pid == 14) {
+                  proton++;
+              }
+           }
+           if(electron>=1&&proton>=1){
+            matches++;
+            for(int row = 0; row < particles.getRows(); row++){
+              int pid = particles.getInt("pid",row);
+              byte type = particles.getByte("type",row);
+              particles.show();
+
+              System.out.printf("type", type);
+              System.out.println("Number protons ", proton );
+           }
+      }
+}
+if(counter==10){
+  break; 
+}
+}
