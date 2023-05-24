@@ -1,3 +1,5 @@
+// does not have electron momentum cap
+
 int matches = 0;
 
 import org.jlab.jnp.hipo4.io.*;
