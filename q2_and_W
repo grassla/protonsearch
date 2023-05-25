@@ -1,0 +1,93 @@
+import org.jlab.jnp.hipo4.io.*; 
+import org.jlab.jnp.hipo4.data.*;
+import org.jlab.groot.data.*;
+import org.jlab.groot.graphics.*;
+import org.jlab.groot.math.*;
+import org.jlab.groot.ui.*;
+import org.jlab.clas.physics.*;
+import org.jlab.clas.physics.LorentzVector;
+import org.jlab.clas.physics.PhysicsEvent;
+import org.jlab.clas.physics.Particle;
+import org.jlab.clas.physics.EventFilter;
+  
+// Create the reader and load in the file
+
+HipoReader reader = new HipoReader(); 
+reader.open("coatjava/bin/SimOuts.hipo"); 
+ 
+Event     event = new Event(); 
+Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
+ 
+// Loop over the events in the file and read particle bank and check for electron in the first raw, 
+// if there is one we can create lorentz vector for the particle and calculate W2 and Q2, and plot it. 
+// First we will declare histogram objects and canvas object:
+
+H1F  hW = new H1F("hW" ,100, 0.5, 8.0);
+H1F hQ2 = new H1F("hQ2",100, 0.1, 8.0);
+hW.setTitleX("W [GeV]");
+hQ2.setTitleX("Q^2 [GeV/c^2]");
+  
+TCanvas ec = new TCanvas("ec",800,400);
+ 
+// Loop over the events and count how many events we have where at least one electron and at least two pos and neg pions are detected.
+
+int counter = 0;
+int elec = 0;
+int proton = 0;
+  
+while(reader.hasNext()==true){
+     reader.nextEvent(event);
+     event.read(particles);
+     if(particles.getRows()>0){
+         int pid = particles.getInt("pid",0);
+              if(pid == 11) elec++;
+              if(pid == 14) proton++;
+         }
+     }
+     if(elec>=1&&pos_pion>=2&&neg_pion>=2){
+          counter++;
+}
+System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton + ");
+ 
+// Loop over the events and calculate Q2 and W from the LorentzVectors 
+
+LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
+LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
+LorentzVector electron = new LorentzVector(); 
+LorentzVector       vW = new LorentzVector(); 
+LorentzVector      vQ2 = new LorentzVector();
+
+// Read the first event and reset to the begining of the file
+
+reader.getEvent(event,0); 
+  
+while(reader.hasNext()==true){
+     reader.nextEvent(event);
+     event.read(particles);
+     if(particles.getRows()>0){
+         int pid = particles.getInt("pid",0);
+         if(pid==11){
+            electron.setPxPyPzM(
+                particles.getFloat("px",0), 
+                particles.getFloat("py",0),
+                particles.getFloat("pz",0),
+                0.0005
+                );
+             
+            vW.copy(vBeam);
+            vW.add(vTarget);
+            vW.sub(electron);
+             
+            vQ2.copy(vBeam);
+            vQ2.sub(electron);
+             
+            hW.fill(vW.mass());
+            hQ2.fill(-vQ2.mass2());
+         }
+     }
+}
+  
+ec.divide(2,1);
+  
+ec.cd(0).draw(hW);
+ec.cd(1).draw(hQ2);
