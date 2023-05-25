@@ -13,7 +13,7 @@ import org.jlab.clas.physics.EventFilter;
 // Create the reader and load in the file
 
 HipoReader reader = new HipoReader(); 
-reader.open("coatjava/bin/SimOuts.hipo"); 
+reader.open("/home/grassla/coatjava/bin/SimOuts.hipo"); 
  
 Event     event = new Event(); 
 Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
@@ -34,20 +34,35 @@ TCanvas ec = new TCanvas("ec",800,400);
 int counter = 0;
 int elec = 0;
 int proton = 0;
+int event_elec = 0;
+int event_proton = 0;
+  
   
 while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
      if(particles.getRows()>0){
-         int pid = particles.getInt("pid",0);
-              if(pid == 11) elec++;
-              if(pid == 14) proton++;
-         }
-     }
-     if(elec>=1&&pos_pion>=2&&neg_pion>=2){
+        event_elec = 0;
+        event_proton = 0;
+        for(int i = 0; i < particles.getRows(); i++) {
+        
+        // also extract beta
+        // get total momentum (add up px py pz?)
+        // do before pid stuff because particles should be identifyible w/out pid
+        
+          int pid = particles.getInt("pid",i);
+              if(pid == 11) event_elec++;
+              if(pid == 2212) event_proton++;
+        }
+     if(event_elec>=1&&event_proton>=1){
           counter++;
+          }
+          elec = elec + event_elec;
+          proton = proton + event_proton;
+     }
+  
 }
-System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton + ");
+System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton );
  
 // Loop over the events and calculate Q2 and W from the LorentzVectors 
 
@@ -65,14 +80,15 @@ while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
      if(particles.getRows()>0){
-         int pid = particles.getInt("pid",0);
-         if(pid==11){
-            electron.setPxPyPzM(
-                particles.getFloat("px",0), 
-                particles.getFloat("py",0),
-                particles.getFloat("pz",0),
-                0.0005
-                );
+        for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
+            if(pid==11){
+             electron.setPxPyPzM(
+                 particles.getFloat("px",i), 
+                  particles.getFloat("py",i),
+                  particles.getFloat("pz",i),
+                  0.0005
+                 );
              
             vW.copy(vBeam);
             vW.add(vTarget);
@@ -84,6 +100,7 @@ while(reader.hasNext()==true){
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
          }
+       }
      }
 }
   
