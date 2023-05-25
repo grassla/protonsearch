@@ -26,14 +26,17 @@ H1F  hW = new H1F("hW" ,100, 0.5, 8.0);
 H1F hQ2 = new H1F("hQ2",100, 0.1, 8.0);
 hW.setTitleX("W [GeV]");
 hQ2.setTitleX("Q^2 [GeV/c^2]");
-H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 20.0, 100, 0.5, 5.0);
+H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 10.0, 100, 0.5, 1.50);
 hBetaVsPTot.setTitleX("P [GeV]");
 hBetaVsPTot.setTitleY("#beta");
+H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
+hQ2vW.setTitleX("W [GeV]");
+hQ2vW.setTitleY("Q^2 [GeV/c^2]");
 
 
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
-TCanvas ec = new TCanvas("ec",900,300);
+TCanvas ec = new TCanvas("ec",800,800);
  
 // Loop over the events and count how many events we have where at least one electron and at least two pos and neg pions are detected.
 
@@ -113,13 +116,15 @@ while(reader.hasNext()==true){
              
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
+            hQ2vW.fill(vW.mass(),-vQ2.mass());
          }
        }
      }
 }
   
-ec.divide(3,1);
+ec.divide(2,2);
   
 ec.cd(0).draw(hW);
 ec.cd(1).draw(hQ2);
 ec.cd(2).draw(hBetaVsPTot);
+ec.cd(3).draw(hQ2vW);
