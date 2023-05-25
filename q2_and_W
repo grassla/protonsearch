@@ -13,7 +13,7 @@ import org.jlab.clas.physics.EventFilter;
 // Create the reader and load in the file
 
 HipoReader reader = new HipoReader(); 
-reader.open("coatjava/bin/SimOuts.hipo"); 
+reader.open("coatjava/bin/BigSimOuts.hipo"); 
  
 Event     event = new Event(); 
 Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
