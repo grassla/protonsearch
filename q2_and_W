@@ -16,7 +16,8 @@ HipoReader reader = new HipoReader();
 reader.open("/home/grassla/coatjava/bin/SimOuts.hipo"); 
  
 Event     event = new Event(); 
-Bank  particles = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
+Bank  gen = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
+Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
 // Create new bank ('generated') using GEN::Particle
  
  
@@ -34,12 +35,21 @@ hBetaVsPTot.setTitleY("#beta");
 H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW.setTitleX("W [GeV]");
 hQ2vW.setTitleY("Q^2 [GeV/c^2]");
-
+//-----------------------------
+H1F  hW_gen = new H1F("hW_gen" ,100, 0.5, 8.0);
+H1F hQ2_gen = new H1F("hQ2_gen",100, 0.1, 8.0);
+hW_gen.setTitleX("W [GeV]");
+hQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+H2F  hQ2vW_gen = new H2F("hQ2vW_gen" , 100, 0.5, 5.0, 100, 0.5, 4.0);
+hQ2vW_gen.setTitleX("W [GeV]");
+hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
+//-------------------------------
 
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
 TCanvas ec = new TCanvas("ec",800,800);
- 
+TCanvas fc = new TCanvas("fc",900,300);
+
 // Loop over the events
 
 int counter = 0;
@@ -124,6 +134,33 @@ while(reader.hasNext()==true){
          }
        }
      }
+     //--------------------------------------------------
+     event.read(gen);
+     if(gen.getRows()>0){
+        for(int i = 0; i < gen.getRows(); i++) {
+          int pid = gen.getInt("pid",i);
+            if(pid==11){
+             electron.setPxPyPzM(
+                  gen.getFloat("px",i), 
+                  gen.getFloat("py",i),
+                  gen.getFloat("pz",i),
+                  0.0005
+                 );
+             
+            vW.copy(vBeam);
+            vW.add(vTarget);
+            vW.sub(electron);
+             
+            vQ2.copy(vBeam);
+            vQ2.sub(electron);
+             
+            hW_gen.fill(vW.mass());
+            hQ2_gen.fill(-vQ2.mass2());
+            hQ2vW_gen.fill(vW.mass(),-vQ2.mass());
+         }
+       }
+     }
+     //-------------------------------------------------------------
 }
   
 ec.divide(2,2);
@@ -132,3 +169,8 @@ ec.cd(0).draw(hW);
 ec.cd(1).draw(hQ2);
 ec.cd(2).draw(hBetaVsPTot);
 ec.cd(3).draw(hQ2vW);
+
+fc.divide(3,1);
+fc.cd(0).draw(hW_gen);
+fc.cd(1).draw(hQ2_gen);
+fc.cd(2).draw(hQ2vW_gen);
