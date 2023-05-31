@@ -16,7 +16,7 @@ HipoReader reader = new HipoReader();
 reader.open("/home/grassla/coatjava/bin/SimOuts.hipo"); 
  
 Event     event = new Event(); 
-Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
+Bank  particles = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
 // Create new bank ('generated') using GEN::Particle
  
  
