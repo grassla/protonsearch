@@ -26,11 +26,11 @@ hQ2.setTitle("Reconstructed Q^2");
 H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 10.0, 100, 0.5, 1.05);
 hBetaVsPTot.setTitleX("P [GeV]");
 hBetaVsPTot.setTitleY("#beta");
-hBetaVsPTot.setTitle("Beta v Total Momentum; Reconstructed");
+hBetaVsPTot.setTitle("Beta v Total Momentum, Reconstructed");
 H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW.setTitleX("W [GeV]");
 hQ2vW.setTitleY("Q^2 [GeV/c^2]");
-hQ2vW.setTitle("Q^2 v W; Reconstructed");
+hQ2vW.setTitle("Q^2 v W, Reconstructed");
 
 H1F  hW_gen = new H1F("hW_gen" ,100, 0.5, 8.0);
 H1F hQ2_gen = new H1F("hQ2_gen",100, 0.1, 8.0);
@@ -41,13 +41,14 @@ hQ2_gen.setTitle("Generated Q^2");
 H2F  hQ2vW_gen = new H2F("hQ2vW_gen" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW_gen.setTitleX("W [GeV]");
 hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
+hQ2vW_gen.setTitle("Q^2 v W, Generated");
 //---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
-TCanvas ec = new TCanvas("ec",800,800);
-TCanvas fc = new TCanvas("fc",900,300);
-TCanvas gc = new TCanvas("gc",300,900);
-TCanvas hc = new TCanvas("hc",300,900);
+TCanvas REC = new TCanvas("REC",800,800);
+TCanvas GEN = new TCanvas("GEN",900,300);
+TCanvas W = new TCanvas("W",300,900);
+TCanvas Q2 = new TCanvas("Q2",300,900);
 //---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
@@ -194,26 +195,26 @@ gQ2_acc.setTitle("Acceptance Q^2");
 
 
 
-ec.divide(2,2);
-ec.cd(0).draw(gW);
-ec.cd(1).draw(gQ2);
-ec.cd(2).draw(hBetaVsPTot);
-ec.cd(3).draw(hQ2vW);
+REC.divide(2,2);
+REC.cd(0).draw(gW);
+REC.cd(1).draw(gQ2);
+REC.cd(2).draw(hBetaVsPTot);
+REC.cd(3).draw(hQ2vW);
 
-fc.divide(3,1);
-fc.cd(0).draw(gW_gen);
-fc.cd(1).draw(gQ2_gen);
-fc.cd(2).draw(hQ2vW_gen);
+GEN.divide(3,1);
+GEN.cd(0).draw(gW_gen);
+GEN.cd(1).draw(gQ2_gen);
+GEN.cd(2).draw(hQ2vW_gen);
 
-gc.divide(1,3);
-gc.cd(0).draw(gW);
-gc.cd(1).draw(gW_gen);
-gc.cd(2).draw(gW_acc);
+W.divide(1,3);
+W.cd(0).draw(gW);
+W.cd(1).draw(gW_gen);
+W.cd(2).draw(gW_acc);
 
-hc.divide(1,3);
-hc.cd(0).draw(gQ2);
-hc.cd(1).draw(gQ2_gen);
-hc.cd(2).draw(gQ2_acc);
+Q2.divide(1,3);
+Q2.cd(0).draw(gQ2);
+Q2.cd(1).draw(gQ2_gen);
+Q2.cd(2).draw(gQ2_acc);
 
 
 gW.setMarkerSize(2);
@@ -222,6 +223,12 @@ gW_acc.setMarkerSize(2);
 gQ2.setMarkerSize(2);
 gQ2_gen.setMarkerSize(2);
 gQ2_acc.setMarkerSize(2);
+gW.setLineColor(2);
+gW_gen.setLineColor(2);
+gW_acc.setLineColor(2);
+gQ2.setLineColor(2);
+gQ2_gen.setLineColor(2);
+gQ2_acc.setLineColor(2);
 
 
 //TDirectory dir = new TDirectory();
