@@ -9,58 +9,49 @@ import org.jlab.clas.physics.LorentzVector;
 import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.clas.physics.Particle;
 import org.jlab.clas.physics.EventFilter;
-  
-// Create the reader and load in the file
-
+//---------------------------------------------------------------------
 HipoReader reader = new HipoReader(); 
 reader.open("/home/grassla/coatjava/bin/SimOuts.hipo"); 
  
 Event     event = new Event(); 
 Bank  gen = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
 Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
-// Create new bank ('generated') using GEN::Particle
- 
- 
-// Loop over the events in the file and read particle bank and check for electron in the first raw, 
-// if there is one we can create lorentz vector for the particle and calculate W2 and Q2, and plot it. 
-// First we will declare histogram objects and canvas object:
-
+//----------------------------------------------------------------------
 H1F  hW = new H1F("hW" ,100, 0.5, 8.0);
 H1F hQ2 = new H1F("hQ2",100, 0.1, 8.0);
 hW.setTitleX("W [GeV]");
+hW.setTitle("Reconstructed W");
 hQ2.setTitleX("Q^2 [GeV/c^2]");
+hQ2.setTitle("Reconstructed Q^2");
 H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 10.0, 100, 0.5, 1.05);
 hBetaVsPTot.setTitleX("P [GeV]");
 hBetaVsPTot.setTitleY("#beta");
 H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW.setTitleX("W [GeV]");
 hQ2vW.setTitleY("Q^2 [GeV/c^2]");
-//-----------------------------
+
 H1F  hW_gen = new H1F("hW_gen" ,100, 0.5, 8.0);
 H1F hQ2_gen = new H1F("hQ2_gen",100, 0.1, 8.0);
 hW_gen.setTitleX("W [GeV]");
+hW_gen.setTitle("Generated W");
 hQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+hQ2_gen.setTitle("Generated Q^2");
 H2F  hQ2vW_gen = new H2F("hQ2vW_gen" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW_gen.setTitleX("W [GeV]");
 hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
-//-------------------------------
-
+//---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
 TCanvas ec = new TCanvas("ec",800,800);
 TCanvas fc = new TCanvas("fc",900,300);
 TCanvas gc = new TCanvas("gc",300,900);
 TCanvas hc = new TCanvas("hc",300,900);
-
-// Loop over the events
-
+//---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
 int proton = 0;
 int event_elec = 0;
 int event_proton = 0;
-
-// DO THIS BUT W GENERATED:
 
 while(reader.hasNext()==true){
      reader.nextEvent(event);
@@ -72,43 +63,31 @@ while(reader.hasNext()==true){
           int pid = particles.getInt("pid",i);
           if(particles.getFloat("beta", i)>0){
             if(pid == 2212){
-        
-        // also extract beta
-        // get total momentum (add up px py pz?)
-        // do before pid stuff because particles should be identifyible w/out pid
               v3Parts.setXYZ(
                 particles.getFloat("px",i), 
                 particles.getFloat("py",i),
-                particles.getFloat("pz",i) ); 
-          
+                particles.getFloat("pz",i) );           
               hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); }
-
               if(pid == 11) event_elec++;
               if(pid == 2212) event_proton++;
         }
      if(event_elec>=1&&event_proton>=1){
-          counter++;
-          
+          counter++;        
           elec = elec + event_elec;
           proton = proton + event_proton; }
      }
   }
 }
 
-System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton );
- 
-// Loop over the events and calculate Q2 and W from the LorentzVectors 
-
+System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton ); 
+//---------------------------------------------------------------------
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
-
-// Read the first event and reset to the begining of the file
-
-reader.getEvent(event,0); 
-  
+//---------------------------------------------------------------------
+reader.getEvent(event,0);  
 while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
@@ -121,8 +100,7 @@ while(reader.hasNext()==true){
                   particles.getFloat("py",i),
                   particles.getFloat("pz",i),
                   0.0005
-                 );
-             
+                 );             
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
@@ -136,7 +114,7 @@ while(reader.hasNext()==true){
          }
        }
      }
-     //--------------------------------------------------
+//---------------------------------------------------------------------
      event.read(gen);
      if(gen.getRows()>0){
         for(int i = 0; i < gen.getRows(); i++) {
@@ -164,15 +142,25 @@ while(reader.hasNext()==true){
          }
        }
      }
-     //-------------------------------------------------------------
+//-------------------------------------------------------------
 }
 
-
 H1F hW_acc=hW.histClone("hW_acc");
-hW_acc.divide(hW_gen);  
+hW_acc.divide(hW_gen);
+hW_acc.setTitleX("W [GeV]");
+hW_acc.setTitle("Acceptance W");
 H1F hQ2_acc=hQ2.histClone("hQ2_acc");
 hQ2_acc.divide(hQ2_gen); 
-  
+hQ2_acc.setTitleX("Q^2 [GeV/c^2]");
+hQ2_acc.setTitle("Acceptance Q^2");
+ 
+hW.setFillColor(33);
+hW_gen.setFillColor(33);
+hW_acc.setFillColor(33);
+hQ2.setFillColor(44);
+hQ2_gen.setFillColor(44);
+hQ2_acc.setFillColor(44);
+
 ec.divide(2,2);
 ec.cd(0).draw(hW);
 ec.cd(1).draw(hQ2);
@@ -193,3 +181,14 @@ hc.divide(1,3);
 hc.cd(0).draw(hQ2);
 hc.cd(1).draw(hQ2_gen);
 hc.cd(2).draw(hQ2_acc);
+
+//can.cd(0).draw(hRandGauss);
+ 
+// Declare the directory where the histogram will be saved in the file
+//TDirectory dir = new TDirectory();
+//dir.mkdir("/Gaussian");
+//dir.cd("Gaussian");
+ 
+//dir.addDataSet(hRandGauss);       // add the histogram to the directory
+//String histFile = "myfile.hipo";  // declare the output file name
+//dir.writeFile(histFile);          // write the file
