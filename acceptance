@@ -26,9 +26,11 @@ hQ2.setTitle("Reconstructed Q^2");
 H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 10.0, 100, 0.5, 1.05);
 hBetaVsPTot.setTitleX("P [GeV]");
 hBetaVsPTot.setTitleY("#beta");
+hBetaVsPTot.setTitle("Beta v Total Momentum; Reconstructed");
 H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW.setTitleX("W [GeV]");
 hQ2vW.setTitleY("Q^2 [GeV/c^2]");
+hQ2vW.setTitle("Q^2 v W; Reconstructed");
 
 H1F  hW_gen = new H1F("hW_gen" ,100, 0.5, 8.0);
 H1F hQ2_gen = new H1F("hQ2_gen",100, 0.1, 8.0);
@@ -62,7 +64,7 @@ while(reader.hasNext()==true){
         for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
           if(particles.getFloat("beta", i)>0){
-            if(pid == 2212){
+            if(pid == 2212){                                // comment this out to see other particles
               v3Parts.setXYZ(
                 particles.getFloat("px",i), 
                 particles.getFloat("py",i),
@@ -70,7 +72,7 @@ while(reader.hasNext()==true){
               hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); }
               if(pid == 11) event_elec++;
               if(pid == 2212) event_proton++;
-        }
+        }                                                   // also comment this out for other particles
      if(event_elec>=1&&event_proton>=1){
           counter++;        
           elec = elec + event_elec;
@@ -153,42 +155,87 @@ H1F hQ2_acc=hQ2.histClone("hQ2_acc");
 hQ2_acc.divide(hQ2_gen); 
 hQ2_acc.setTitleX("Q^2 [GeV/c^2]");
 hQ2_acc.setTitle("Acceptance Q^2");
- 
-hW.setFillColor(33);
-hW_gen.setFillColor(33);
-hW_acc.setFillColor(33);
-hQ2.setFillColor(44);
-hQ2_gen.setFillColor(44);
-hQ2_acc.setFillColor(44);
+//-------------------------------------------------------------
+GraphErrors gW = new GraphErrors();
+gW = hW.getGraph();
+GraphErrors gW_gen = new GraphErrors();
+gW_gen = hW_gen.getGraph();
+GraphErrors gW_acc = new GraphErrors();
+gW_acc = hW_acc.getGraph();
+GraphErrors gQ2 = new GraphErrors();
+gQ2 = hQ2.getGraph();
+GraphErrors gQ2_gen = new GraphErrors();
+gQ2_gen = hQ2_gen.getGraph();
+GraphErrors gQ2_acc = new GraphErrors();
+gQ2_acc = hQ2_acc.getGraph();
+//-------------------------------------------------------------
+//gW.setFillColor(8);
+//gW_gen.setFillColor(8);
+//gW_acc.setFillColor(8);
+//gQ2.setFillColor(6);
+//gQ2_gen.setFillColor(6);
+//gQ2_acc.setFillColor(6);
+
+
+
+
+gW.setTitleX("W [GeV]");
+gW.setTitle("Reconstructed W");
+gQ2.setTitleX("Q^2 [GeV/c^2]");
+gQ2.setTitle("Reconstructed Q^2");
+gW_gen.setTitleX("W [GeV]");
+gW_gen.setTitle("Generated W");
+gQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+gQ2_gen.setTitle("Generated Q^2");
+gW_acc.setTitleX("W [GeV]");
+gW_acc.setTitle("Acceptance W");
+gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
+gQ2_acc.setTitle("Acceptance Q^2");
+
+
 
 ec.divide(2,2);
-ec.cd(0).draw(hW);
-ec.cd(1).draw(hQ2);
+ec.cd(0).draw(gW);
+ec.cd(1).draw(gQ2);
 ec.cd(2).draw(hBetaVsPTot);
 ec.cd(3).draw(hQ2vW);
 
 fc.divide(3,1);
-fc.cd(0).draw(hW_gen);
-fc.cd(1).draw(hQ2_gen);
+fc.cd(0).draw(gW_gen);
+fc.cd(1).draw(gQ2_gen);
 fc.cd(2).draw(hQ2vW_gen);
 
 gc.divide(1,3);
-gc.cd(0).draw(hW);
-gc.cd(1).draw(hW_gen);
-gc.cd(2).draw(hW_acc);
+gc.cd(0).draw(gW);
+gc.cd(1).draw(gW_gen);
+gc.cd(2).draw(gW_acc);
 
 hc.divide(1,3);
-hc.cd(0).draw(hQ2);
-hc.cd(1).draw(hQ2_gen);
-hc.cd(2).draw(hQ2_acc);
+hc.cd(0).draw(gQ2);
+hc.cd(1).draw(gQ2_gen);
+hc.cd(2).draw(gQ2_acc);
 
-//can.cd(0).draw(hRandGauss);
- 
-// Declare the directory where the histogram will be saved in the file
+
+gW.setMarkerSize(2);
+gW_gen.setMarkerSize(2);
+gW_acc.setMarkerSize(2);
+gQ2.setMarkerSize(2);
+gQ2_gen.setMarkerSize(2);
+gQ2_acc.setMarkerSize(2);
+
+
 //TDirectory dir = new TDirectory();
-//dir.mkdir("/Gaussian");
-//dir.cd("Gaussian");
+//dir.mkdir("/prosearch");
+//dir.cd("prosearch");
+
  
-//dir.addDataSet(hRandGauss);       // add the histogram to the directory
-//String histFile = "myfile.hipo";  // declare the output file name
-//dir.writeFile(histFile);          // write the file
+// dir.addDataSet(hW);  
+// dir.addDataSet(hW_gen);
+// dir.addDataSet(hW_acc);
+// dir.addDataSet(hQ2);
+// dir.addDataSet(hQ2_gen);
+// dir.addDataSet(hQ2_acc);
+// dir.addDataSet(hQ2vW);
+// dir.addDataSet(hBetaVsPTot);
+// String histFile = "myfile.hipo";  // declare the output file name
+// dir.writeFile(histFile);          // write the file
