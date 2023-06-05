@@ -42,6 +42,11 @@ H2F  hQ2vW_gen = new H2F("hQ2vW_gen" , 100, 0.5, 5.0, 100, 0.5, 4.0);
 hQ2vW_gen.setTitleX("W [GeV]");
 hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
 hQ2vW_gen.setTitle("Q^2 v W, Generated");
+
+H1F htheta = new H1F("htheta" ,100,0.0,1.0);
+H1F htheta_gen = new H1F("htheta_gen" ,100,0.0,1.0);
+H1F hphi = new H1F("hphi" ,100,-3.16,3.16);
+H1F hphi_gen = new H1F("hphi_gen" ,100,-3.16,3.16);
 //---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
@@ -49,6 +54,7 @@ TCanvas REC = new TCanvas("REC",800,800);
 TCanvas GEN = new TCanvas("GEN",900,300);
 TCanvas W = new TCanvas("W",300,900);
 TCanvas Q2 = new TCanvas("Q2",300,900);
+TCanvas angles = new TCanvas("angles",800,800);
 //---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
@@ -87,6 +93,7 @@ System.out.println("processed # " + counter + " , electrons : " + elec + " , pro
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
+LorentzVector proton = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
 //---------------------------------------------------------------------
@@ -103,7 +110,7 @@ while(reader.hasNext()==true){
                   particles.getFloat("py",i),
                   particles.getFloat("pz",i),
                   0.0005
-                 );             
+                 );  
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
@@ -115,6 +122,16 @@ while(reader.hasNext()==true){
             hQ2.fill(-vQ2.mass2());
             hQ2vW.fill(vW.mass(),-vQ2.mass());
          }
+          if(pid==2212){
+                proton.setPxPyPzM(
+                  particles.getFloat("px",i), 
+                  particles.getFloat("py",i),
+                  particles.getFloat("pz",i),
+                  0.000938
+                 ); 
+          htheta.fill(proton.theta());
+          hphi.fill(proton.phi());
+          }
        }
      }
 //---------------------------------------------------------------------
@@ -143,6 +160,16 @@ while(reader.hasNext()==true){
             
             
          }
+              if(pid==2212){
+                proton.setPxPyPzM(
+                  particles.getFloat("px",i), 
+                  particles.getFloat("py",i),
+                  particles.getFloat("pz",i),
+                  0.000938
+                 ); 
+          htheta_gen.fill(proton.theta());
+          hphi_gen.fill(proton.phi());
+          }
        }
      }
 //-------------------------------------------------------------
@@ -156,6 +183,15 @@ H1F hQ2_acc=hQ2.histClone("hQ2_acc");
 hQ2_acc.divide(hQ2_gen); 
 hQ2_acc.setTitleX("Q^2 [GeV/c^2]");
 hQ2_acc.setTitle("Acceptance Q^2");
+
+H1F htheta_acc=htheta.histClone("htheta_acc");
+htheta_acc.divide(htheta_gen);
+htheta_acc.setTitleX("Degrees");
+htheta_acc.setTitle("Acceptance Theta");
+H1F hphi_acc=hphi.histClone("hphi_acc");
+hphi_acc.divide(hphi_gen);
+hphi_acc.setTitleX("Degrees");
+hphi_acc.setTitle("Acceptance Theta");
 //-------------------------------------------------------------
 GraphErrors gW = new GraphErrors();
 gW = hW.getGraph();
@@ -192,7 +228,14 @@ gW_acc.setTitleX("W [GeV]");
 gW_acc.setTitle("Acceptance W");
 gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
 gQ2_acc.setTitle("Acceptance Q^2");
-
+htheta.setTitleX("Degrees");
+htheta.setTitle("Reconstructed Theta");
+hphi.setTitleX("Degrees");
+hphi.setTitle("Reconstructed Phi");
+htheta_gen.setTitleX("Degrees");
+htheta_gen.setTitle("Generated Theta");
+hphi_gen.setTitleX("Degrees");
+hphi_gen.setTitle("Generated Phi");
 
 
 REC.divide(2,2);
@@ -216,6 +259,13 @@ Q2.cd(0).draw(gQ2);
 Q2.cd(1).draw(gQ2_gen);
 Q2.cd(2).draw(gQ2_acc);
 
+angles.divide(2,3);
+angles.cd(0).draw(htheta);
+angles.cd(1).draw(hphi);
+angles.cd(2).draw(htheta_gen);
+angles.cd(3).draw(hphi_gen);
+angles.cd(4).draw(htheta_acc);
+angles.cd(5).draw(hphi_acc);
 
 gW.setMarkerSize(2);
 gW_gen.setMarkerSize(2);
