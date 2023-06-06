@@ -57,10 +57,10 @@ H1F htheta_elec_gen = new H1F("htheta_elec_gen" ,90,0.0,90);
 H1F hphi_elec = new H1F("hphi_elec" ,180,-180,180);
 H1F hphi_elec_gen = new H1F("hphi_elec_gen" ,180,-180,180);
 
-//H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,-2.0,2.0,100,0.5.1.05);
-//hdeltabetavPTot.setTitleX("Change in P [GeV]");
-//hdeltabetavPTot.setTitleY("#beta");
-//hdeltabetaPTot.setTitle("Delta Beta v Total Momentum");
+H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,-2.0,6.0,100,0.0,5.0);
+hdeltabetavPTot.setTitleX("Change in P [GeV]");
+hdeltabetavPTot.setTitleY("#beta");
+hdeltabetavPTot.setTitle("Delta Beta v Total Momentum");
 
 H1F hP_pro = new H1F("hP_pro" ,100,0.0,10.0);
 H1F hP_elec = new H1F("hP_elec" ,100,1.0,10.0);
@@ -76,6 +76,7 @@ TCanvas Q2 = new TCanvas("Q2",300,900);
 TCanvas angles = new TCanvas("angles",800,800);
 TCanvas Tbeta = new TCanvas("Tbeta",800,800);
 TCanvas P = new TCanvas("P",600,600);
+TCanvas deltaBvPTot = new TCanvas("deltaBvPTot" ,600,600);
 //---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
@@ -108,7 +109,8 @@ while(reader.hasNext()==true){
               deltabeta = particles.getFloat("beta",i) - beta_calc ;
               hbeta.fill(particles.getFloat("beta",i));
               hbeta_calc.fill(beta_calc);
-              hdeltabeta.fill(deltabeta);              
+              hdeltabeta.fill(deltabeta); 
+              hdeltabetavPTot.fill(deltabeta,v3Parts.mag());
 //--------------------------------------------------------------------
               if(pid == 2212){                                // comment this out to see other particles           
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
@@ -303,7 +305,7 @@ hphi_gen.setTitleX("Degrees");
 hphi_gen.setTitle("Generated Phi Proton");
 hbeta.setTitle("Measured #beta ");
 hbeta_calc.setTitle("Calculated #beta ");
-hdeltabeta.setTitle(" #delta #beta ");
+hdeltabeta.setTitle("Delta #beta ");
 htheta_elec.setTitleX("Degrees");
 htheta_elec.setTitle("Reconstructed Theta Electron");
 hphi_elec.setTitleX("Degrees");
@@ -366,6 +368,8 @@ Tbeta.divide(1,3);
 Tbeta.cd(0).draw(hbeta);
 Tbeta.cd(1).draw(hbeta_calc);
 Tbeta.cd(2).draw(hdeltabeta);
+
+deltaBvPTot.cd(0).draw(hdeltabetavPTot);
 
 gW.setMarkerSize(2);
 gW_gen.setMarkerSize(2);
