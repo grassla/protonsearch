@@ -189,8 +189,8 @@ while(reader.hasNext()==true){
                   0.0005
                  );
              hP_elec_gen.fill(electron.p());
-             htheta_elec_gen.fill(electron.theta()*(180/3.1415));
-             hphi_elec_gen.fill(electron.phi()*(180/3.1415)); 
+            htheta_elec_gen.fill(electron.theta()*(180/3.1415));
+            hphi_elec_gen.fill(electron.phi()*(180/3.1415)); 
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
@@ -349,6 +349,19 @@ angles.cd(7).draw(hphi_gen_elec);
 angles.cd(10).draw(htheta_acc_elec);
 angles.cd(11).draw(hphi_acc_elec);
 
+htheta.setFillColor(5);
+htheta_gen.setFillColor(5);
+htheta_acc.setFillColor(5);
+hphi.setFillColor(7);
+hphi_gen.setFillColor(7);
+hphi_acc.setFillColor(7);
+htheta_elec.setFillColor(6);
+htheta_gen_elec.setFillColor(6);
+htheta_acc_elec.setFillColor(6);
+hphi_elec.setFillColor(2);
+hphi_gen_elec.setFillColor(2);
+hphi_acc_elec.setFillColor(2);
+
 Tbeta.divide(1,3);
 Tbeta.cd(0).draw(hbeta);
 Tbeta.cd(1).draw(hbeta_calc);
@@ -374,6 +387,13 @@ P.cd(2).draw(hP_pro_gen);
 P.cd(3).draw(hP_elec_gen);
 P.cd(4).draw(hP_pro_acc);
 P.cd(5).draw(hP_elec_acc);
+
+hP_pro.setFillColor(8);
+hP_pro_gen.setFillColor(8);
+hP_pro_acc.setFillColor(8);
+hP_elec.setFillColor(9);
+hP_elec_gen.setFillColor(9);
+hP_elec_acc.setFillColor(9);
 
 //TDirectory dir = new TDirectory();
 //dir.mkdir("/prosearch");
