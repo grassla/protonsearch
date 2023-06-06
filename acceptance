@@ -48,9 +48,24 @@ H1F htheta_gen = new H1F("htheta_gen" ,90,0.0,90);
 H1F hphi = new H1F("hphi" ,180,-180,180);
 H1F hphi_gen = new H1F("hphi_gen" ,180,-180,180);
 
-H1F hbeta = new H1F("hbeta" ,100,0.5,2.0);
-H1F hbeta_calc = new H1F("hbeta_calc" ,100,0.5,2.0);
-H1F hdeltabeta = new H1F("hdeltabeta" ,100,0.5,2.0);
+H1F hbeta = new H1F("hbeta" ,100,0.0,1.5);
+H1F hbeta_calc = new H1F("hbeta_calc" ,100,0.0,1.5);
+H1F hdeltabeta = new H1F("hdeltabeta" ,100,-2.0,2.0);
+
+H1F htheta_elec = new H1F("htheta" ,90,0.0,90);
+H1F htheta_gen_elec = new H1F("htheta_gen" ,90,0.0,90);
+H1F hphi_elec = new H1F("hphi" ,180,-180,180);
+H1F hphi_gen_elec = new H1F("hphi_gen" ,180,-180,180);
+
+//H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,-2.0,2.0,100,0.5.1.05);
+//hdeltavetavPTot.setTitleX("Change in P [GeV]");
+//hdeltabetavPTot.setTitleY("#beta");
+//hdeltabetaPTot.setTitle("Delta Beta v Total Momentum");
+
+//H1F hP_pro = new H1F("hP_pro" ,100,0.5,1.05);
+//H1F hP_elec = new H1F("hP_elec" ,100,0.5,1.05);
+//H1F hP_pro_gen = new H1F("hP_pro_gen" ,100,0.5,1.05);
+//H1F hP_elec_gen = new H1F("hP_elec_gen" ,100,0.5,1.05);
 //---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
@@ -59,7 +74,8 @@ TCanvas GEN = new TCanvas("GEN",900,300);
 TCanvas W = new TCanvas("W",300,900);
 TCanvas Q2 = new TCanvas("Q2",300,900);
 TCanvas angles = new TCanvas("angles",800,800);
-TCanvas Tbeta = new TCanvas("Tbeta",300,900);
+TCanvas Tbeta = new TCanvas("Tbeta",800,800);
+TCanvas P = new TCanvas("P",600,600);
 //---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
@@ -128,6 +144,8 @@ while(reader.hasNext()==true){
                   particles.getFloat("pz",i),
                   0.0005
                  );  
+             htheta_elec.fill(electron.theta()*(180/3.1415));
+             hphi_elec.fill(electron.phi()*(180/3.1415));
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
@@ -163,7 +181,8 @@ while(reader.hasNext()==true){
                   gen.getFloat("pz",i),
                   0.0005
                  );
-             
+             htheta_elec_gen.fill(electron.theta()*(180/3.1415));
+             hphi_elec_gen.fill(electron.phi()*(180/3.1415)); 
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
@@ -204,11 +223,20 @@ hQ2_acc.setTitle("Acceptance Q^2");
 H1F htheta_acc=htheta.histClone("htheta_acc");
 htheta_acc.divide(htheta_gen);
 htheta_acc.setTitleX("Degrees");
-htheta_acc.setTitle("Acceptance Theta");
+htheta_acc.setTitle("Acceptance Theta Proton");
 H1F hphi_acc=hphi.histClone("hphi_acc");
 hphi_acc.divide(hphi_gen);
 hphi_acc.setTitleX("Degrees");
-hphi_acc.setTitle("Acceptance Theta");
+hphi_acc.setTitle("Acceptance Theta Proton");
+
+H1F htheta_acc_elec=htheta.histClone("htheta_acc_elec");
+htheta_acc_elec.divide(htheta_gen_elec);
+htheta_acc_elec.setTitleX("Degrees");
+htheta_acc_elec.setTitle("Acceptance Theta Electron");
+H1F hphi_acc_elec=hphi_elec.histClone("hphi_acc_elec");
+hphi_acc_elec.divide(hphi_gen_elec);
+hphi_acc_elec.setTitleX("Degrees");
+hphi_acc_elec.setTitle("Acceptance Theta Electron");
 //-------------------------------------------------------------
 GraphErrors gW = new GraphErrors();
 gW = hW.getGraph();
@@ -279,13 +307,19 @@ Q2.cd(0).draw(gQ2);
 Q2.cd(1).draw(gQ2_gen);
 Q2.cd(2).draw(gQ2_acc);
 
-angles.divide(2,3);
+angles.divide(4,3);
 angles.cd(0).draw(htheta);
 angles.cd(1).draw(hphi);
 angles.cd(2).draw(htheta_gen);
 angles.cd(3).draw(hphi_gen);
 angles.cd(4).draw(htheta_acc);
 angles.cd(5).draw(hphi_acc);
+angles.cd(6).draw(htheta_elec);
+angles.cd(7).draw(hphi_elec);
+angles.cd(8).draw(htheta_gen_elec);
+angles.cd(9).draw(hphi_gen_elec);
+angles.cd(10).draw(htheta_acc_elec);
+angles.cd(11).draw(hphi_acc_elec);
 
 Tbeta.divide(1,3);
 Tbeta.cd(0).draw(hbeta);
