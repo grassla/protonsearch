@@ -66,6 +66,9 @@ H1F hP_pro = new H1F("hP_pro" ,100,0.0,10.0);
 H1F hP_elec = new H1F("hP_elec" ,100,1.0,10.0);
 H1F hP_pro_gen = new H1F("hP_pro_gen" ,100,0.0,10.0);
 H1F hP_elec_gen = new H1F("hP_elec_gen" ,100,1.0,10.0);
+
+H1F hpT = new H1F("hpT", 100,0.0,2.5);
+H1F hpT_gen = new H1F("hpT_gen", 100,0.0,2.5);
 //---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
@@ -77,6 +80,7 @@ TCanvas angles = new TCanvas("angles",800,800);
 TCanvas Tbeta = new TCanvas("Tbeta",800,800);
 TCanvas P = new TCanvas("P",600,600);
 TCanvas deltaBvPTot = new TCanvas("deltaBvPTot" ,600,600);
+TCanvas Transverse_P = new TCanvas("Transverse_P" ,300,900);
 //---------------------------------------------------------------------
 int counter = 0;
 int elec = 0;
@@ -86,6 +90,8 @@ int event_proton = 0;
 double beta_calc = 0;
 double deltabeta = 0;
 double p = 0;
+double pT = 0;
+double pT_gen = 0;
 
 while(reader.hasNext()==true){
      reader.nextEvent(event);
@@ -104,6 +110,8 @@ while(reader.hasNext()==true){
               if(pid == 11) event_elec++;
               if(pid == 2212) event_proton++;
 //---------------------------------------------------------------------
+              pT = Math.sqrt(particles.getFloat("px",i)*particles.getFloat("px",i)+particles.getFloat("py",i)*particles.getFloat("py",i));
+              hpT.fill(pT);
               p  = v3Parts.mag();
               beta_calc = p / Math.sqrt(p*p + 0.938*0.938);
               deltabeta = particles.getFloat("beta",i) - beta_calc ;
@@ -176,6 +184,7 @@ while(reader.hasNext()==true){
           htheta.fill(proton.theta()*(180/3.1415));
           hphi.fill(proton.phi()*(180/3.1415));
           }
+          
        }
      }
 //---------------------------------------------------------------------
@@ -217,10 +226,23 @@ while(reader.hasNext()==true){
           htheta_gen.fill(proton.theta()*(180/3.1415));
           hphi_gen.fill(proton.phi()*(180/3.1415));
           }
+
+             v3Parts.setXYZ(
+                particles.getFloat("px",i), 
+                particles.getFloat("py",i),
+                particles.getFloat("pz",i) );
+                pT_gen = Math.sqrt(gen.getFloat("px",i)*gen.getFloat("px",i)+gen.getFloat("py",i)*gen.getFloat("py",i)); 
+                hpT_gen.fill(pT_gen); 
        }
      }
 //-------------------------------------------------------------
 }
+
+H1F hpT_acc = hpT.histClone("hpT");
+hpT_acc.divide(hpT_gen);
+hpT.setTitle("Transverse Momentum Reconstructed");
+hpT_gen.setTitle("Transverse Momentum Generated");
+hpT_acc.setTitle("Transverse Momentum Accepted");
 
 H1F hW_acc=hW.histClone("hW_acc");
 hW_acc.divide(hW_gen);
@@ -398,6 +420,11 @@ hP_pro_acc.setFillColor(8);
 hP_elec.setFillColor(9);
 hP_elec_gen.setFillColor(9);
 hP_elec_acc.setFillColor(9);
+
+Transverse_P.divide(1,3);
+Transverse_P.cd(0).draw(hpT);
+Transverse_P.cd(1).draw(hpT_gen);
+Transverse_P.cd(2).draw(hpT_acc);
 
 //TDirectory dir = new TDirectory();
 //dir.mkdir("/prosearch");
