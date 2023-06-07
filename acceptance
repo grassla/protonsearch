@@ -57,10 +57,14 @@ H1F htheta_elec_gen = new H1F("htheta_elec_gen" ,90,0.0,90);
 H1F hphi_elec = new H1F("hphi_elec" ,180,-180,180);
 H1F hphi_elec_gen = new H1F("hphi_elec_gen" ,180,-180,180);
 
-H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,-2.0,6.0,100,0.0,5.0);
-hdeltabetavPTot.setTitleX("Change in P [GeV]");
-hdeltabetavPTot.setTitleY("#beta");
-hdeltabetavPTot.setTitle("Delta Beta v Total Momentum");
+H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,0.0,5.0,100,-2.0,5.0);
+hdeltabetavPTot.setTitleY("Total P [GeV]");
+hdeltabetavPTot.setTitleX("#Delta #beta");
+hdeltabetavPTot.setTitle("Total Momentum v #Delta #Beta");
+H2F hdeltabeta_provPTot = new H2F("hdeltabeta_provPTot" ,100,0.0,5.0,100,-0.25,0.25);
+hdeltabeta_provPTot.setTitleY("Total P [GeV]");
+hdeltabeta_provPTot.setTitleX("#Delta #beta");
+hdeltabeta_provPTot.setTitle("Total Momentum v #Delta #Beta PROTON ONLY");
 
 H1F hP_pro = new H1F("hP_pro" ,100,0.0,10.0);
 H1F hP_elec = new H1F("hP_elec" ,100,1.0,10.0);
@@ -89,6 +93,7 @@ int event_elec = 0;
 int event_proton = 0;
 double beta_calc = 0;
 double deltabeta = 0;
+double deltabeta_pro = 0;
 double p = 0;
 double pT = 0;
 double pT_gen = 0;
@@ -122,11 +127,12 @@ while(reader.hasNext()==true){
               hbeta.fill(particles.getFloat("beta",i));
               hbeta_calc.fill(beta_calc);
               hdeltabeta.fill(deltabeta); 
-              hdeltabetavPTot.fill(deltabeta,v3Parts.mag());
+              hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
 //--------------------------------------------------------------------
               if(pid == 2212){                                // comment this out to see other particles           
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
-                 hP_pro.fill(v3Parts.mag()); }
+                 hP_pro.fill(v3Parts.mag()); 
+                 hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); }
              if(pid ==11){
                  hP_elec.fill(v3Parts.mag()); }
         }                                                   // also comment this out for other particles
@@ -395,7 +401,9 @@ Tbeta.cd(0).draw(hbeta);
 Tbeta.cd(1).draw(hbeta_calc);
 Tbeta.cd(2).draw(hdeltabeta);
 
+deltaBvPTot.divide(2,1);
 deltaBvPTot.cd(0).draw(hdeltabetavPTot);
+deltaBvPTot.cd(1).draw(hdeltabeta_provPTot);
 
 gW.setMarkerSize(2);
 gW_gen.setMarkerSize(2);
