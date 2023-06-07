@@ -92,6 +92,8 @@ double deltabeta = 0;
 double p = 0;
 double pT = 0;
 double pT_gen = 0;
+int num_events = 0;
+int num_events_count = 0;
 
 while(reader.hasNext()==true){
      reader.nextEvent(event);
@@ -109,6 +111,8 @@ while(reader.hasNext()==true){
 
               if(pid == 11) event_elec++;
               if(pid == 2212) event_proton++;
+              num_events_count++;
+              num_events = num_events + num_events_count;
 //---------------------------------------------------------------------
               pT = Math.sqrt(particles.getFloat("px",i)*particles.getFloat("px",i)+particles.getFloat("py",i)*particles.getFloat("py",i));
               hpT.fill(pT);
@@ -134,7 +138,7 @@ while(reader.hasNext()==true){
   }
 }
 
-System.out.println("processed # " + counter + " , electrons : " + elec + " , protons : " + proton ); 
+System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + proton ); 
 //---------------------------------------------------------------------
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
