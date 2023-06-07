@@ -150,6 +150,7 @@ LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
 LorentzVector proton = new LorentzVector(); 
+LorentzVector proton_gen = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
 //---------------------------------------------------------------------
@@ -226,15 +227,15 @@ while(reader.hasNext()==true){
             
          }
               if(pid==2212){
-                proton.setPxPyPzM(
+                proton_gen.setPxPyPzM(
                   particles.getFloat("px",i), 
                   particles.getFloat("py",i),
                   particles.getFloat("pz",i),
                   0.938
                  ); 
-          hP_pro_gen.fill(proton.p());
-          htheta_gen.fill(proton.theta()*(180/3.1415));
-          hphi_gen.fill(proton.phi()*(180/3.1415));
+          hP_pro_gen.fill(proton_gen.p());
+          htheta_gen.fill(proton_gen.theta()*(180/3.1415));
+          hphi_gen.fill(proton_gen.phi()*(180/3.1415));
           }
 
              v3Parts.setXYZ(
