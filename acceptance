@@ -181,7 +181,7 @@ while(reader.hasNext()==true){
              
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
-            hQ2vW.fill(vW.mass(),-vQ2.mass());
+            hQ2vW.fill(vW.mass(),-vQ2.mass2());
          }
           if(pid==2212){
                 proton.setPxPyPzM(
@@ -221,7 +221,7 @@ while(reader.hasNext()==true){
              
             hW_gen.fill(vW.mass());
             hQ2_gen.fill(-vQ2.mass2());
-            hQ2vW_gen.fill(vW.mass(),-vQ2.mass());
+            hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());
             
             
          }
@@ -272,12 +272,12 @@ hphi_acc.divide(hphi_gen);
 hphi_acc.setTitleX("Degrees");
 hphi_acc.setTitle("Acceptance Phi Proton");
 
-H1F htheta_acc_elec=htheta.histClone("htheta_acc_elec");
-htheta_acc_elec.divide(htheta_gen_elec);
+H1F htheta_acc_elec=htheta_elec.histClone("htheta_acc_elec");
+htheta_acc_elec.divide(htheta_elec_gen);
 htheta_acc_elec.setTitleX("Degrees");
 htheta_acc_elec.setTitle("Acceptance Theta Electron");
 H1F hphi_acc_elec=hphi_elec.histClone("hphi_acc_elec");
-hphi_acc_elec.divide(hphi_gen_elec);
+hphi_acc_elec.divide(hphi_elec_gen);
 hphi_acc_elec.setTitleX("Degrees");
 hphi_acc_elec.setTitle("Acceptance Phi Electron");
 
@@ -342,10 +342,10 @@ htheta_elec.setTitleX("Degrees");
 htheta_elec.setTitle("Reconstructed Theta Electron");
 hphi_elec.setTitleX("Degrees");
 hphi_elec.setTitle("Reconstructed Phi Electron");
-htheta_gen_elec.setTitleX("Degrees");
-htheta_gen_elec.setTitle("Generated Theta Electron");
-hphi_gen_elec.setTitleX("Degrees");
-hphi_gen_elec.setTitle("Generated Phi Electron");
+htheta_elec_gen.setTitleX("Degrees");
+htheta_elec_gen.setTitle("Generated Theta Electron");
+hphi_elec_gen.setTitleX("Degrees");
+hphi_elec_gen.setTitle("Generated Phi Electron");
 
 
 REC.divide(2,2);
@@ -378,8 +378,8 @@ angles.cd(8).draw(htheta_acc);
 angles.cd(9).draw(hphi_acc);
 angles.cd(2).draw(htheta_elec);
 angles.cd(3).draw(hphi_elec);
-angles.cd(6).draw(htheta_gen_elec);
-angles.cd(7).draw(hphi_gen_elec);
+angles.cd(6).draw(htheta_elec_gen);
+angles.cd(7).draw(hphi_elec_gen);
 angles.cd(10).draw(htheta_acc_elec);
 angles.cd(11).draw(hphi_acc_elec);
 
@@ -390,10 +390,10 @@ hphi.setFillColor(7);
 hphi_gen.setFillColor(7);
 hphi_acc.setFillColor(7);
 htheta_elec.setFillColor(6);
-htheta_gen_elec.setFillColor(6);
+htheta_elec_gen.setFillColor(6);
 htheta_acc_elec.setFillColor(6);
 hphi_elec.setFillColor(2);
-hphi_gen_elec.setFillColor(2);
+hphi_elec_gen.setFillColor(2);
 hphi_acc_elec.setFillColor(2);
 
 Tbeta.divide(1,3);
