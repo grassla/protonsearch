@@ -83,6 +83,14 @@ H1F hY = new H1F("hY", 100, 0.0,  1.3);
 hY.setTitle("Y Reconstructed");
 H1F hX = new H1F("hX", 100, 0.0,  1.3); 
 hX.setTitle("X Reconstructed");
+H1F hnu_gen = new H1F("hnu_gen", 100, 0.0,  15.0); 
+hnu_gen.setTitle("#nu Generated");
+H1F hZ_gen = new H1F("hZ_gen", 100, 0.0,  1.3); 
+hZ_gen.setTitle("Z Generated");
+H1F hY_gen = new H1F("hY_gen", 100, 0.0,  1.3); 
+hY_gen.setTitle("Y Generated");
+H1F hX_gen = new H1F("hX_gen", 100, 0.0,  1.3); 
+hX_gen.setTitle("X Generated");
 //---------------------------------------------------------------------
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 
@@ -160,6 +168,7 @@ System.out.println("processed # " + num_events + " w/ e- and p " + counter + " ,
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
+LorentzVector electron_gen = new LorentzVector();
 LorentzVector proton = new LorentzVector(); 
 LorentzVector proton_gen = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
@@ -219,21 +228,21 @@ while(reader.hasNext()==true){
         for(int i = 0; i < gen.getRows(); i++) {
           int pid = gen.getInt("pid",i);
             if(pid==11){
-             electron.setPxPyPzM(
+             electron_gen.setPxPyPzM(
                   gen.getFloat("px",i), 
                   gen.getFloat("py",i),
                   gen.getFloat("pz",i),
                   0.0005
                  );
-             hP_elec_gen.fill(electron.p());
-            htheta_elec_gen.fill(electron.theta()*(180/3.1415));
-            hphi_elec_gen.fill(electron.phi()*(180/3.1415)); 
+             hP_elec_gen.fill(electron_gen.p());
+            htheta_elec_gen.fill(electron_gen.theta()*(180/3.1415));
+            hphi_elec_gen.fill(electron_gen.phi()*(180/3.1415)); 
             vW.copy(vBeam);
             vW.add(vTarget);
             vW.sub(electron);
              
             vQ2.copy(vBeam);
-            vQ2.sub(electron);
+            vQ2.sub(electron_gen);
              
             hW_gen.fill(vW.mass());
             hQ2_gen.fill(-vQ2.mass2());
@@ -261,7 +270,11 @@ while(reader.hasNext()==true){
                 hpT_gen.fill(pT_gen); 
                 
                 
-                // ########################################################
+             
+          hnu_gen.fill(vBeam.e() - electron_gen.e());
+          hZ_gen.fill(proton_gen.e() / (vBeam.e() - electron_gen.e()));
+          hY_gen.fill((vBeam.e() - electron_gen.e()) / vBeam.e());
+          hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e())));
        }
      }
 //-------------------------------------------------------------
@@ -312,6 +325,20 @@ hP_pro_gen.setTitle("Proton Momentum Generated");
 hP_elec_gen.setTitle("Electron Momentum Generated");
 hP_pro_acc.setTitle("Proton Momentum Acceptance");
 hP_elec_acc.setTitle("Electron Momentum Acceptance");
+
+
+H1F hnu_acc=hnu.histClone("hnu_acc");
+hnu_acc.divide(hnu_gen);
+hnu_acc.setTitle("#nu Acceptance");
+H1F hZ_acc=hZ.histClone("hZ_acc");
+hZ_acc.divide(hZ_gen);
+hZ_acc.setTitle("Z Acceptance");
+H1F hY_acc=hY.histClone("hY_acc");
+hY_acc.divide(hY_gen);
+hY_acc.setTitle("Y Acceptance");
+H1F hX_acc=hX.histClone("hX_acc");
+hX_acc.divide(hX_gen);
+hX_acc.setTitle("X Acceptance");
 //-------------------------------------------------------------
 GraphErrors gW = new GraphErrors();
 gW = hW.getGraph();
@@ -417,6 +444,19 @@ hphi_elec.setFillColor(2);
 hphi_elec_gen.setFillColor(2);
 hphi_acc_elec.setFillColor(2);
 
+hnu.setFillColor(3);
+hnu_gen.setFillColor(3);
+hnu_acc.setFillColor(3);
+hZ.setFillColor(8);
+hZ_gen.setFillColor(8);
+hZ_acc.setFillColor(8);
+hY.setFillColor(4);
+hY_gen.setFillColor(4);
+hY_acc.setFillColor(4);
+hX.setFillColor(9);
+hX_gen.setFillColor(9);
+hX_acc.setFillColor(9);
+
 Tbeta.divide(1,3);
 Tbeta.cd(0).draw(hbeta);
 Tbeta.cd(1).draw(hbeta_calc);
@@ -459,11 +499,19 @@ Transverse_P.cd(0).draw(hpT);
 Transverse_P.cd(1).draw(hpT_gen);
 Transverse_P.cd(2).draw(hpT_acc);
 
-Mandelstam.divide(4,1);
+Mandelstam.divide(4,3);
 Mandelstam.cd(0).draw(hnu);
 Mandelstam.cd(1).draw(hZ);
 Mandelstam.cd(2).draw(hY);
 Mandelstam.cd(3).draw(hX);
+Mandelstam.cd(4).draw(hnu_gen);
+Mandelstam.cd(5).draw(hZ_gen);
+Mandelstam.cd(6).draw(hY_gen);
+Mandelstam.cd(7).draw(hX_gen);
+Mandelstam.cd(8).draw(hnu_acc);
+Mandelstam.cd(9).draw(hZ_acc);
+Mandelstam.cd(10).draw(hY_acc);
+Mandelstam.cd(11).draw(hX_acc);
 
 //TDirectory dir = new TDirectory();
 //dir.mkdir("/prosearch");
