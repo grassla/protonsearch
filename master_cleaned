@@ -111,14 +111,6 @@ htheta_elec_gen.setTitleX("Degrees");
 htheta_elec_gen.setTitle("Generated #Theta Electron");
 hphi_elec_gen.setTitleX("Degrees");
 hphi_elec_gen.setTitle("Generated #Phi Electron");
-gW.setTitleX("W [GeV]");
-gW.setTitle("Reconstructed W");
-gQ2.setTitleX("Q^2 [GeV/c^2]");
-gQ2.setTitle("Reconstructed Q^2");
-gW_gen.setTitleX("W [GeV]");
-gW_gen.setTitle("Generated W");
-gQ2_gen.setTitleX("Q^2 [GeV/c^2]");
-gQ2_gen.setTitle("Generated Q^2");
 //---------------------------------------------------------------------
 // Create TCanvases.
 TCanvas REC = new TCanvas("REC",800,800);
@@ -173,7 +165,7 @@ while(reader.hasNext()==true){
                 particles.getFloat("pz",i) );
 
               if(pid == 11) event_elec++;
-              if(pid == 2212) event_proton++;
+              if(pid == 2212) event_pro++;
               num_events_count++;
               num_events = num_events + num_events_count;
 
@@ -194,7 +186,7 @@ while(reader.hasNext()==true){
              if(pid ==11){
                  hP_elec.fill(v3Parts.mag()); }
         }                                                   // also comment this out for other particles
-        if(event_elec>=1&&event_proton>=1){
+        if(event_elec>=1&&event_pro>=1){
           counter++;        
           elec = elec + event_elec;
           pro = pro + event_pro; }   
@@ -331,10 +323,6 @@ hW_acc.setTitleX("W [GeV]");
 hW_acc.setTitle("Acceptance W");
 hpT_acc.setTitle("Transverse Momentum Acceptance");
 hX_acc.setTitle("X Acceptance");
-gW_acc.setTitleX("W [GeV]");
-gW_acc.setTitle("Acceptance W");
-gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
-gQ2_acc.setTitle("Acceptance Q^2");
 //-------------------------------------------------------------
 // Create graphs from histograms to allow error bars.
 GraphErrors gW = new GraphErrors();
@@ -349,6 +337,20 @@ GraphErrors gQ2_gen = new GraphErrors();
 gQ2_gen = hQ2_gen.getGraph();
 GraphErrors gQ2_acc = new GraphErrors();
 gQ2_acc = hQ2_acc.getGraph();
+//-------------------------------------------------------------
+// Label graphs.
+gW.setTitleX("W [GeV]");
+gW.setTitle("Reconstructed W");
+gQ2.setTitleX("Q^2 [GeV/c^2]");
+gQ2.setTitle("Reconstructed Q^2");
+gW_gen.setTitleX("W [GeV]");
+gW_gen.setTitle("Generated W");
+gQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+gQ2_gen.setTitle("Generated Q^2");
+gW_acc.setTitleX("W [GeV]");
+gW_acc.setTitle("Acceptance W");
+gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
+gQ2_acc.setTitle("Acceptance Q^2");
 //-------------------------------------------------------------
 // Divide TCanvases and draw histograms in them.
 REC.divide(2,2);
