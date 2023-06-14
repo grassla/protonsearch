@@ -45,14 +45,14 @@ H1F hP_pro_gen = new H1F("hP_pro_gen" ,100,0.0,10.0);
 H1F hP_elec_gen = new H1F("hP_elec_gen" ,100,1.0,10.0);
 H1F hpT = new H1F("hpT", 100,0.0,2.5);
 H1F hpT_gen = new H1F("hpT_gen", 100,0.0,2.5);
-H1F hnu = new H1F("hnu", 100, 0.0,  15.0); 
-H1F hZ = new H1F("hZ", 100, 0.0,  1.3); 
-H1F hY = new H1F("hY", 100, 0.0,  1.3); 
-H1F hX = new H1F("hX", 100, 0.0,  1.3); 
-H1F hnu_gen = new H1F("hnu_gen", 100, 0.0,  15.0); 
-H1F hZ_gen = new H1F("hZ_gen", 100, 0.0,  1.3); 
-H1F hY_gen = new H1F("hY_gen", 100, 0.0,  1.3); 
-H1F hX_gen = new H1F("hX_gen", 100, 0.0,  1.3); 
+H1F hnu = new H1F("hnu", 100, 0.0,  10.0); 
+H1F hZ = new H1F("hZ", 100, 0.05,  1.3); 
+H1F hY = new H1F("hY", 100, 0.0,  0.9); 
+H1F hX = new H1F("hX", 100, 0.05,  1.0); 
+H1F hnu_gen = new H1F("hnu_gen", 100, 0.0,  10.0); 
+H1F hZ_gen = new H1F("hZ_gen", 100, 0.05,  1.3); 
+H1F hY_gen = new H1F("hY_gen", 100, 0.0,  0.9); 
+H1F hX_gen = new H1F("hX_gen", 100, 0.05,  1.0); 
 //-------------------------------------------------------------
 // Label histograms.
 hW.setTitleX("W [GeV]");
