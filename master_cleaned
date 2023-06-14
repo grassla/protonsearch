@@ -135,9 +135,9 @@ TCanvas Mandelstam = new TCanvas("Mandelstam", 400,400);
 // Create variables.
 int counter = 0;
 int elec = 0;
-int proton = 0;
+int pro = 0;
 int event_elec = 0;
-int event_proton = 0;
+int event_pro = 0;
 double beta_calc = 0;
 double deltabeta = 0;
 double deltabeta_pro = 0;
@@ -197,7 +197,7 @@ while(reader.hasNext()==true){
         if(event_elec>=1&&event_proton>=1){
           counter++;        
           elec = elec + event_elec;
-          proton = proton + event_proton; }   
+          pro = pro + event_pro; }   
           if(pid==11){
              electron.setPxPyPzM(
                  particles.getFloat("px",i), 
@@ -232,7 +232,7 @@ while(reader.hasNext()==true){
           hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e())));
        }
      }
-System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + proton );
+System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + pro );
 //---------------------------------------------------------------------
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
