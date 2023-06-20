@@ -11,7 +11,7 @@ import org.jlab.clas.physics.Particle;
 import org.jlab.clas.physics.EventFilter;
 //---------------------------------------------------------------------
 HipoReader reader = new HipoReader(); 
-reader.open("/home/grassla/coatjava/bin/SimOuts.hipo"); 
+reader.open("/home/grassla/SimOuts.hipo"); 
  
 Event     event = new Event(); 
 Bank  gen = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
