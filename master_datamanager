@@ -139,6 +139,8 @@ double pT = 0;
 double pT_gen = 0;
 int num_events = 0;
 int num_events_count = 0; 
+
+
 //---------------------------------------------------------------------
 // Create 3- and 4-Vectors.
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
@@ -151,14 +153,16 @@ LorentzVector       vW = new LorentzVector();
 LorentzVector      vQ2 = new LorentzVector();
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 //---------------------------------------------------------------------
+
+
 // Loop through events from Reconstructed bank and fill histograms.
+EventFilter  eventFilter = new EventFilter("11:2212:X+:X-:Xn");
 reader.getEvent(event,0);  
 while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
-     if(particles.getRows()>0){
-        for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
+     PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
+     if(eventFilter.isValid(physEvent)==true){
           if(particles.getFloat("beta", i)>0){
              v3Parts.setXYZ(
                 particles.getFloat("px",i), 
