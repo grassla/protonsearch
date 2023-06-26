@@ -153,26 +153,21 @@ LorentzVector       vW = new LorentzVector();
 LorentzVector      vQ2 = new LorentzVector();
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 //---------------------------------------------------------------------
-
-
+PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
 // Loop through events from Reconstructed bank and fill histograms.
-EventFilter  eventFilter = new EventFilter("11:2212:X+:X-:Xn");
+EventFilter  all = new EventFilter("X+:X-:Xn");
+EventFilter  only_elec = new EventFilter("11");
+EventFilter  only_pro = new EventFilter("2212");
 reader.getEvent(event,0);  
 while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
-     PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
-     if(eventFilter.isValid(physEvent)==true){
+     if(all.isValid(physEvent)==true){
           if(particles.getFloat("beta", i)>0){
              v3Parts.setXYZ(
                 particles.getFloat("px",i), 
                 particles.getFloat("py",i),
                 particles.getFloat("pz",i) );
-
-              if(pid == 11) event_elec++;
-              if(pid == 2212) event_pro++;
-              num_events_count++;
-              num_events = num_events + num_events_count;
 
               pT = Math.sqrt(particles.getFloat("px",i)*particles.getFloat("px",i)+particles.getFloat("py",i)*particles.getFloat("py",i));
               hpT.fill(pT);
@@ -191,11 +186,14 @@ while(reader.hasNext()==true){
              if(pid ==11){
                  hP_elec.fill(v3Parts.mag()); }
         }                                                   // also comment this out for other particles
-        if(event_elec>=1&&event_pro>=1){
-          counter++;        
-          elec = elec + event_elec;
-          pro = pro + event_pro; }   
-          if(pid==11){
+
+
+//----------------------------------------
+//----------------------------------------
+//----------------------------------------
+//change some methods to rid of lorentzvectors
+
+          if(only_elec.isValid(physEvent)==true){
              electron.setPxPyPzM(
                  particles.getFloat("px",i), 
                   particles.getFloat("py",i),
@@ -213,7 +211,7 @@ while(reader.hasNext()==true){
             hQ2.fill(-vQ2.mass2());
             hQ2vW.fill(vW.mass(),-vQ2.mass2());
          }
-          if(pid==2212){
+          if(only_pro.isValid(physEvent)==true){
                 proton.setPxPyPzM(
                   particles.getFloat("px",i), 
                   particles.getFloat("py",i),
@@ -229,7 +227,6 @@ while(reader.hasNext()==true){
           hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e())));
        }
      }
-System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + pro );
 //---------------------------------------------------------------------
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
