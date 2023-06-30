@@ -1,4 +1,5 @@
-import org.jlab.jnp.hipo4.io.*; 
+// Import Libraries
+import org.jlab.jnp.hipo4.io.*;
 import org.jlab.jnp.hipo4.data.*;
 import org.jlab.groot.data.*;
 import org.jlab.groot.graphics.*;
@@ -10,371 +11,87 @@ import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.clas.physics.Particle;
 import org.jlab.clas.physics.EventFilter;
 //---------------------------------------------------------------------
-HipoReader reader = new HipoReader(); 
-reader.open("/home/grassla/SimOuts.hipo"); 
- 
-Event     event = new Event(); 
+// Create HipoReader object and load in file. Create event class and bank instance.
+HipoReader reader = new HipoReader();
+reader.open("/home/grassla/SimOuts.hipo");
+Event 	event = new Event();
 Bank  gen = new Bank(reader.getSchemaFactory().getSchema("MC::Particle"));
 Bank  particles = new Bank(reader.getSchemaFactory().getSchema("REC::Particle"));
 //----------------------------------------------------------------------
+// Create histograms.
 H1F  hW = new H1F("hW" ,100, 0.5, 8.0);
 H1F hQ2 = new H1F("hQ2",100, 0.1, 8.0);
-hW.setTitleX("W [GeV]");
-hW.setTitle("Reconstructed W");
-hQ2.setTitleX("Q^2 [GeV/c^2]");
-hQ2.setTitle("Reconstructed Q^2");
 H2F hBetaVsPTot = new H2F("hBetaVsPTot" , 100, 0.0, 10.0, 100, 0.5, 1.05);
-hBetaVsPTot.setTitleX("P [GeV]");
-hBetaVsPTot.setTitleY("#beta");
-hBetaVsPTot.setTitle("#beta v Total Momentum, Reconstructed");
 H2F  hQ2vW = new H2F("hQ2vW" , 100, 0.5, 5.0, 100, 0.5, 4.0);
-hQ2vW.setTitleX("W [GeV]");
-hQ2vW.setTitleY("Q^2 [GeV/c^2]");
-hQ2vW.setTitle("Q^2 v W, Reconstructed");
-
 H1F  hW_gen = new H1F("hW_gen" ,100, 0.5, 8.0);
 H1F hQ2_gen = new H1F("hQ2_gen",100, 0.1, 8.0);
-hW_gen.setTitleX("W [GeV]");
-hW_gen.setTitle("Generated W");
-hQ2_gen.setTitleX("Q^2 [GeV/c^2]");
-hQ2_gen.setTitle("Generated Q^2");
 H2F  hQ2vW_gen = new H2F("hQ2vW_gen" , 100, 0.5, 5.0, 100, 0.5, 4.0);
-hQ2vW_gen.setTitleX("W [GeV]");
-hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
-hQ2vW_gen.setTitle("Q^2 v W, Generated");
-
 H1F htheta = new H1F("htheta" ,90,0.0,90);
 H1F htheta_gen = new H1F("htheta_gen" ,90,0.0,90);
 H1F hphi = new H1F("hphi" ,180,-180,180);
 H1F hphi_gen = new H1F("hphi_gen" ,180,-180,180);
-
 H1F hbeta = new H1F("hbeta" ,100,0.0,1.5);
 H1F hbeta_calc = new H1F("hbeta_calc" ,100,0.0,1.5);
 H1F hdeltabeta = new H1F("hdeltabeta" ,100,-2.0,2.0);
-
 H1F htheta_elec = new H1F("htheta_elec" ,90,0.0,90);
 H1F htheta_elec_gen = new H1F("htheta_elec_gen" ,90,0.0,90);
 H1F hphi_elec = new H1F("hphi_elec" ,180,-180,180);
 H1F hphi_elec_gen = new H1F("hphi_elec_gen" ,180,-180,180);
-
 H2F hdeltabetavPTot = new H2F("hdeltabetavPTot" , 100,0.0,5.0,100,-2.0,5.0);
-hdeltabetavPTot.setTitleY("Total P [GeV]");
-hdeltabetavPTot.setTitleX("#Delta #beta");
-hdeltabetavPTot.setTitle("Total Momentum v #Delta #Beta");
 H2F hdeltabeta_provPTot = new H2F("hdeltabeta_provPTot" ,100,0.0,5.0,100,-0.25,0.25);
-hdeltabeta_provPTot.setTitleY("Total P [GeV]");
-hdeltabeta_provPTot.setTitleX("#Delta #beta");
-hdeltabeta_provPTot.setTitle("Total Momentum v #Delta #Beta PROTON ONLY");
-
 H1F hP_pro = new H1F("hP_pro" ,100,0.0,10.0);
 H1F hP_elec = new H1F("hP_elec" ,100,1.0,10.0);
 H1F hP_pro_gen = new H1F("hP_pro_gen" ,100,0.0,10.0);
 H1F hP_elec_gen = new H1F("hP_elec_gen" ,100,1.0,10.0);
-
-H1F hpT = new H1F("hpT", 100,0.0,2.5);
-H1F hpT_gen = new H1F("hpT_gen", 100,0.0,2.5);
-
-
-H1F hnu = new H1F("hnu", 100, 0.0,  15.0); 
-hnu.setTitle("#nu Reconstructed");
-H1F hZ = new H1F("hZ", 100, 0.0,  1.3); 
-hZ.setTitle("Z Reconstructed");
-H1F hY = new H1F("hY", 100, 0.0,  1.3); 
-hY.setTitle("Y Reconstructed");
-H1F hX = new H1F("hX", 100, 0.0,  1.3); 
-hX.setTitle("X Reconstructed");
-H1F hnu_gen = new H1F("hnu_gen", 100, 0.0,  15.0); 
-hnu_gen.setTitle("#nu Generated");
-H1F hZ_gen = new H1F("hZ_gen", 100, 0.0,  1.3); 
-hZ_gen.setTitle("Z Generated");
-H1F hY_gen = new H1F("hY_gen", 100, 0.0,  1.3); 
-hY_gen.setTitle("Y Generated");
-H1F hX_gen = new H1F("hX_gen", 100, 0.0,  1.3); 
-hX_gen.setTitle("X Generated");
-//---------------------------------------------------------------------
-Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
-
-TCanvas REC = new TCanvas("REC",800,800);
-TCanvas GEN = new TCanvas("GEN",900,300);
-TCanvas W = new TCanvas("W",300,900);
-TCanvas Q2 = new TCanvas("Q2",300,900);
-TCanvas angles = new TCanvas("angles",800,800);
-TCanvas Tbeta = new TCanvas("Tbeta",800,800);
-TCanvas P = new TCanvas("P",600,600);
-TCanvas deltaBvPTot = new TCanvas("deltaBvPTot" ,600,600);
-TCanvas Transverse_P = new TCanvas("Transverse_P" ,300,900);
-TCanvas Mandelstam = new TCanvas("Mandelstam", 400,400);
-//---------------------------------------------------------------------
-int counter = 0;
-int elec = 0;
-int proton = 0;
-int event_elec = 0;
-int event_proton = 0;
-double beta_calc = 0;
-double deltabeta = 0;
-double deltabeta_pro = 0;
-double p = 0;
-double pT = 0;
-double pT_gen = 0;
-int num_events = 0;
-int num_events_count = 0;
-
-while(reader.hasNext()==true){
-     reader.nextEvent(event);
-     event.read(particles);
-     if(particles.getRows()>0){
-        event_elec = 0;
-        event_proton = 0;
-        for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-          if(particles.getFloat("beta", i)>0){
-             v3Parts.setXYZ(
-                particles.getFloat("px",i), 
-                particles.getFloat("py",i),
-                particles.getFloat("pz",i) );
-
-              if(pid == 11) event_elec++;
-              if(pid == 2212) event_proton++;
-              num_events_count++;
-              num_events = num_events + num_events_count;
-//---------------------------------------------------------------------
-              pT = Math.sqrt(particles.getFloat("px",i)*particles.getFloat("px",i)+particles.getFloat("py",i)*particles.getFloat("py",i));
-              hpT.fill(pT);
-              p  = v3Parts.mag();
-              beta_calc = p / Math.sqrt(p*p + 0.938*0.938);
-              deltabeta = particles.getFloat("beta",i) - beta_calc ;
-              hbeta.fill(particles.getFloat("beta",i));
-              hbeta_calc.fill(beta_calc);
-              hdeltabeta.fill(deltabeta); 
-              hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
-//--------------------------------------------------------------------
-              if(pid == 2212){                                // comment this out to see other particles           
-                 hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
-                 hP_pro.fill(v3Parts.mag()); 
-                 hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); }
-             if(pid ==11){
-                 hP_elec.fill(v3Parts.mag()); }
-        }                                                   // also comment this out for other particles
-     if(event_elec>=1&&event_proton>=1){
-          counter++;        
-          elec = elec + event_elec;
-          proton = proton + event_proton; }
-     }
-  }
-}
-
-System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + proton ); 
-//---------------------------------------------------------------------
-LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
-LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
-LorentzVector electron = new LorentzVector(); 
-LorentzVector electron_gen = new LorentzVector();
-LorentzVector proton = new LorentzVector(); 
-LorentzVector proton_gen = new LorentzVector(); 
-LorentzVector       vW = new LorentzVector(); 
-LorentzVector      vQ2 = new LorentzVector();
-//---------------------------------------------------------------------
-reader.getEvent(event,0);  
-while(reader.hasNext()==true){
-     reader.nextEvent(event);
-     event.read(particles);
-     if(particles.getRows()>0){
-        for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-            if(pid==11){
-             electron.setPxPyPzM(
-                 particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.0005
-                 );  
-             htheta_elec.fill(electron.theta()*(180/3.1415));
-             hphi_elec.fill(electron.phi()*(180/3.1415));
-             
-             
-             
-            vW.copy(vBeam);
-            vW.add(vTarget);
-            vW.sub(electron);
-             
-            vQ2.copy(vBeam);
-            vQ2.sub(electron);
-             
-            hW.fill(vW.mass());
-            hQ2.fill(-vQ2.mass2());
-            hQ2vW.fill(vW.mass(),-vQ2.mass2());
-         }
-          if(pid==2212){
-                proton.setPxPyPzM(
-                  particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.938
-                 ); 
-          
-          htheta.fill(proton.theta()*(180/3.1415));
-          hphi.fill(proton.phi()*(180/3.1415));
-          }
-
-          hnu.fill(vBeam.e() - electron.e());
-          hZ.fill(proton.e() / (vBeam.e() - electron.e()));
-          hY.fill((vBeam.e() - electron.e()) / vBeam.e());
-          hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e())));
-       }
-     }
-//---------------------------------------------------------------------
-     event.read(gen);
-     if(gen.getRows()>0){
-        for(int i = 0; i < gen.getRows(); i++) {
-          int pid = gen.getInt("pid",i);
-            if(pid==11){
-             electron_gen.setPxPyPzM(
-                  gen.getFloat("px",i), 
-                  gen.getFloat("py",i),
-                  gen.getFloat("pz",i),
-                  0.0005
-                 );
-             hP_elec_gen.fill(electron_gen.p());
-            htheta_elec_gen.fill(electron_gen.theta()*(180/3.1415));
-            hphi_elec_gen.fill(electron_gen.phi()*(180/3.1415)); 
-            vW.copy(vBeam);
-            vW.add(vTarget);
-            vW.sub(electron);
-             
-            vQ2.copy(vBeam);
-            vQ2.sub(electron_gen);
-             
-            hW_gen.fill(vW.mass());
-            hQ2_gen.fill(-vQ2.mass2());
-            hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());
-            
-            
-         }
-              if(pid==2212){
-                proton_gen.setPxPyPzM(
-                  particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.938
-                 ); 
-          hP_pro_gen.fill(proton_gen.p());
-          htheta_gen.fill(proton_gen.theta()*(180/3.1415));
-          hphi_gen.fill(proton_gen.phi()*(180/3.1415));
-          }
-
-             v3Parts.setXYZ(
-                particles.getFloat("px",i), 
-                particles.getFloat("py",i),
-                particles.getFloat("pz",i) );
-                pT_gen = Math.sqrt(gen.getFloat("px",i)*gen.getFloat("px",i)+gen.getFloat("py",i)*gen.getFloat("py",i)); 
-                hpT_gen.fill(pT_gen); 
-                
-                
-             
-          hnu_gen.fill(vBeam.e() - electron_gen.e());
-          hZ_gen.fill(proton_gen.e() / (vBeam.e() - electron_gen.e()));
-          hY_gen.fill((vBeam.e() - electron_gen.e()) / vBeam.e());
-          hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e())));
-       }
-     }
+H1F hpT = new H1F("hpT", 100,0.0,1.7);
+H1F hpT_gen = new H1F("hpT_gen", 100,0.0,1.7);
+H1F hnu = new H1F("hnu", 100, 0.0,  10.0);
+H1F hZ = new H1F("hZ", 100, 0.05,  1.3);
+H1F hY = new H1F("hY", 100, 0.0,  0.9);
+H1F hX = new H1F("hX", 100, 0.05,  1.0);
+H1F hnu_gen = new H1F("hnu_gen", 100, 0.0,  10.0);
+H1F hZ_gen = new H1F("hZ_gen", 100, 0.05,  1.3);
+H1F hY_gen = new H1F("hY_gen", 100, 0.0,  0.9);
+H1F hX_gen = new H1F("hX_gen", 100, 0.05,  1.0);
 //-------------------------------------------------------------
-}
-
-
-
-H1F hpT_acc = hpT.histClone("hpT");
-hpT_acc.divide(hpT_gen);
-hpT.setTitle("Transverse Momentum Reconstructed");
-hpT_gen.setTitle("Transverse Momentum Generated");
-hpT_acc.setTitle("Transverse Momentum Acceptance");
-
-H1F hW_acc=hW.histClone("hW_acc");
-hW_acc.divide(hW_gen);
-hW_acc.setTitleX("W [GeV]");
-hW_acc.setTitle("Acceptance W");
-H1F hQ2_acc=hQ2.histClone("hQ2_acc");
-hQ2_acc.divide(hQ2_gen); 
-hQ2_acc.setTitleX("Q^2 [GeV/c^2]");
-hQ2_acc.setTitle("Acceptance Q^2");
-
-H1F htheta_acc=htheta.histClone("htheta_acc");
-htheta_acc.divide(htheta_gen);
-htheta_acc.setTitleX("Degrees");
-htheta_acc.setTitle("Acceptance #Theta Proton");
-H1F hphi_acc=hphi.histClone("hphi_acc");
-hphi_acc.divide(hphi_gen);
-hphi_acc.setTitleX("Degrees");
-hphi_acc.setTitle("Acceptance #Phi Proton");
-
-H1F htheta_acc_elec=htheta_elec.histClone("htheta_acc_elec");
-htheta_acc_elec.divide(htheta_elec_gen);
-htheta_acc_elec.setTitleX("Degrees");
-htheta_acc_elec.setTitle("Acceptance #Theta Electron");
-H1F hphi_acc_elec=hphi_elec.histClone("hphi_acc_elec");
-hphi_acc_elec.divide(hphi_elec_gen);
-hphi_acc_elec.setTitleX("Degrees");
-hphi_acc_elec.setTitle("Acceptance #Phi Electron");
-
-H1F hP_pro_acc = hP_pro.histClone("hP_pro_acc");
-hP_pro_acc.divide(hP_pro_gen);
-H1F hP_elec_acc = hP_elec.histClone("hP_elec_acc");
-hP_elec_acc.divide(hP_elec_gen);
+// Label histograms.
+hW.setTitleX("W [GeV]");
+hW.setTitle("Reconstructed W");
+hQ2.setTitleX("Q^2 [GeV/c^2]");
+hQ2.setTitle("Reconstructed Q^2");
+hBetaVsPTot.setTitleX("P [GeV]");
+hBetaVsPTot.setTitleY("#beta");
+hBetaVsPTot.setTitle("#beta v Total Momentum, Reconstructed");
+hQ2vW.setTitleX("W [GeV]");
+hQ2vW.setTitleY("Q^2 [GeV/c^2]");
+hQ2vW.setTitle("Q^2 v W, Reconstructed");
+hW_gen.setTitleX("W [GeV]");
+hW_gen.setTitle("Generated W");
+hQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+hQ2_gen.setTitle("Generated Q^2");
+hQ2vW_gen.setTitleX("W [GeV]");
+hQ2vW_gen.setTitleY("Q^2 [GeV/c^2]");
+hQ2vW_gen.setTitle("Q^2 v W, Generated");
+hdeltabetavPTot.setTitleY("Total P [GeV]");
+hdeltabetavPTot.setTitleX("#Delta #beta");
+hdeltabetavPTot.setTitle("Total Momentum v #Delta #Beta");
+hdeltabeta_provPTot.setTitleY("Total P [GeV]");
+hdeltabeta_provPTot.setTitleX("#Delta #beta");
+hdeltabeta_provPTot.setTitle("Total Momentum v #Delta #Beta PROTON ONLY");
 hP_pro.setTitle("Proton Momentum Reconstructed");
 hP_elec.setTitle("Electron Momentum Reconstructed");
 hP_pro_gen.setTitle("Proton Momentum Generated");
 hP_elec_gen.setTitle("Electron Momentum Generated");
-hP_pro_acc.setTitle("Proton Momentum Acceptance");
-hP_elec_acc.setTitle("Electron Momentum Acceptance");
-
-
-H1F hnu_acc=hnu.histClone("hnu_acc");
-hnu_acc.divide(hnu_gen);
-hnu_acc.setTitle("#nu Acceptance");
-H1F hZ_acc=hZ.histClone("hZ_acc");
-hZ_acc.divide(hZ_gen);
-hZ_acc.setTitle("Z Acceptance");
-H1F hY_acc=hY.histClone("hY_acc");
-hY_acc.divide(hY_gen);
-hY_acc.setTitle("Y Acceptance");
-H1F hX_acc=hX.histClone("hX_acc");
-hX_acc.divide(hX_gen);
-hX_acc.setTitle("X Acceptance");
-//-------------------------------------------------------------
-GraphErrors gW = new GraphErrors();
-gW = hW.getGraph();
-GraphErrors gW_gen = new GraphErrors();
-gW_gen = hW_gen.getGraph();
-GraphErrors gW_acc = new GraphErrors();
-gW_acc = hW_acc.getGraph();
-GraphErrors gQ2 = new GraphErrors();
-gQ2 = hQ2.getGraph();
-GraphErrors gQ2_gen = new GraphErrors();
-gQ2_gen = hQ2_gen.getGraph();
-GraphErrors gQ2_acc = new GraphErrors();
-gQ2_acc = hQ2_acc.getGraph();
-//-------------------------------------------------------------
-//gW.setFillColor(8);
-//gW_gen.setFillColor(8);
-//gW_acc.setFillColor(8);
-//gQ2.setFillColor(6);
-//gQ2_gen.setFillColor(6);
-//gQ2_acc.setFillColor(6);
-
-
-
-
-gW.setTitleX("W [GeV]");
-gW.setTitle("Reconstructed W");
-gQ2.setTitleX("Q^2 [GeV/c^2]");
-gQ2.setTitle("Reconstructed Q^2");
-gW_gen.setTitleX("W [GeV]");
-gW_gen.setTitle("Generated W");
-gQ2_gen.setTitleX("Q^2 [GeV/c^2]");
-gQ2_gen.setTitle("Generated Q^2");
-gW_acc.setTitleX("W [GeV]");
-gW_acc.setTitle("Acceptance W");
-gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
-gQ2_acc.setTitle("Acceptance Q^2");
+hpT.setTitle("Transverse Momentum Reconstructed");
+hpT_gen.setTitle("Transverse Momentum Generated");
+hnu.setTitle("#nu Reconstructed");
+hZ.setTitle("Z Reconstructed");
+hY.setTitle("Y Reconstructed");
+hX.setTitle("X Reconstructed");
+hnu_gen.setTitle("#nu Generated");
+hZ_gen.setTitle("Z Generated");
+hY_gen.setTitle("Y Generated");
+hX_gen.setTitle("X Generated");
 htheta.setTitleX("Degrees");
 htheta.setTitle("Reconstructed #Theta Proton");
 hphi.setTitleX("Degrees");
@@ -394,29 +111,265 @@ htheta_elec_gen.setTitleX("Degrees");
 htheta_elec_gen.setTitle("Generated #Theta Electron");
 hphi_elec_gen.setTitleX("Degrees");
 hphi_elec_gen.setTitle("Generated #Phi Electron");
+//---------------------------------------------------------------------
+// Create TCanvases.
+TCanvas REC = new TCanvas("REC",800,800);
+TCanvas GEN = new TCanvas("GEN",900,300);
+TCanvas W = new TCanvas("W",300,900);
+TCanvas Q2 = new TCanvas("Q2",300,900);
+TCanvas angles = new TCanvas("angles",800,800);
+TCanvas Tbeta = new TCanvas("Tbeta",800,800);
+TCanvas P = new TCanvas("P",600,600);
+TCanvas deltaBvPTot = new TCanvas("deltaBvPTot" ,600,600);
+TCanvas Transverse_P = new TCanvas("Transverse_P" ,300,900);
+TCanvas Mandelstam = new TCanvas("Mandelstam", 400,400);
+//---------------------------------------------------------------------
+// Create variables.
+int counter = 0;
+int elec = 0;
+int pro = 0;
+int event_elec = 0;
+int event_pro = 0;
+double beta_calc = 0;
+double deltabeta = 0;
+double deltabeta_pro = 0;
+double p = 0;
+double pT = 0;
+double pT_gen = 0;
+int num_events = 0;
+int num_events_count = 0;
+//---------------------------------------------------------------------
+// Create 3- and 4-Vectors.
+LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
+LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
+LorentzVector electron = new LorentzVector();
+LorentzVector electron_gen = new LorentzVector();
+LorentzVector proton = new LorentzVector();
+LorentzVector proton_gen = new LorentzVector();
+LorentzVector   	vW = new LorentzVector();
+LorentzVector  	vQ2 = new LorentzVector();
+Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
+//---------------------------------------------------------------------
+// Loop through events from Reconstructed bank and fill histograms.
+reader.getEvent(event,0);  
+while(reader.hasNext()==true){
+ 	reader.nextEvent(event);
+ 	event.read(particles);
+ 	if(particles.getRows()>0){
+    	for(int i = 0; i < particles.getRows(); i++) {
+      	int pid = particles.getInt("pid",i);
+      	if(particles.getFloat("beta", i)>0){
+         	v3Parts.setXYZ(
+            	particles.getFloat("px",i),
+            	particles.getFloat("py",i),
+            	particles.getFloat("pz",i) );
 
+          	if(pid == 11) event_elec++;
+          	if(pid == 2212) event_pro++;
+          	num_events_count++;
+          	num_events = num_events + num_events_count;
 
+          	pT = Math.sqrt(particles.getFloat("px",i)*particles.getFloat("px",i)+particles.getFloat("py",i)*particles.getFloat("py",i));
+          	hpT.fill(pT);
+          	p  = v3Parts.mag();
+          	beta_calc = p / Math.sqrt(p*p + 0.938*0.938);
+          	deltabeta = particles.getFloat("beta",i) - beta_calc ;
+          	hbeta.fill(particles.getFloat("beta",i));
+          	hbeta_calc.fill(beta_calc);
+          	hdeltabeta.fill(deltabeta);
+          	hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
+         	 
+          	if(pid == 2212){                            	// comment this out to see other particles      	 
+             	hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i));
+             	hP_pro.fill(v3Parts.mag());
+             	hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); }
+         	if(pid ==11){
+             	hP_elec.fill(v3Parts.mag()); }
+    	}                                               	// also comment this out for other particles
+    	if(event_elec>=1&&event_pro>=1){
+      	counter++;   	 
+      	elec = elec + event_elec;
+      	pro = pro + event_pro; }   
+      	if(pid==11){
+         	electron.setPxPyPzM(
+             	particles.getFloat("px",i),
+              	particles.getFloat("py",i),
+              	particles.getFloat("pz",i),
+              	0.0005
+             	);  
+        	htheta_elec.fill(electron.theta()*(180/3.1415));
+        	hphi_elec.fill(electron.phi()*(180/3.1415));
+        	vW.copy(vBeam);
+        	vW.add(vTarget);
+        	vW.sub(electron);
+        	vQ2.copy(vBeam);
+        	vQ2.sub(electron);
+        	hW.fill(vW.mass());
+        	hQ2.fill(-vQ2.mass2());
+        	hQ2vW.fill(vW.mass(),-vQ2.mass2());
+     	}
+      	if(pid==2212){
+            	proton.setPxPyPzM(
+              	particles.getFloat("px",i),
+              	particles.getFloat("py",i),
+              	particles.getFloat("pz",i),
+              	0.938
+             	);
+      	htheta.fill(proton.theta()*(180/3.1415));
+      	hphi.fill(proton.phi()*(180/3.1415));
+      	}
+      	hnu.fill(vBeam.e() - electron.e());
+      	hZ.fill(proton.e() / (vBeam.e() - electron.e()));
+      	hY.fill((vBeam.e() - electron.e()) / vBeam.e());
+      	hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e())));
+   	}
+ 	}
+System.out.println("processed # " + num_events + " w/ e- and p " + counter + " , electrons : " + elec + " , protons : " + pro );
+//---------------------------------------------------------------------
+// Loop through events from Generated bank and fill histograms.
+ 	event.read(gen);
+ 	if(gen.getRows()>0){
+    	for(int i = 0; i < gen.getRows(); i++) {
+      	int pid = gen.getInt("pid",i);
+        	if(pid==11){
+         	electron_gen.setPxPyPzM(
+              	gen.getFloat("px",i),
+              	gen.getFloat("py",i),
+              	gen.getFloat("pz",i),
+              	0.0005
+             	);
+        	hP_elec_gen.fill(electron_gen.p());
+        	htheta_elec_gen.fill(electron_gen.theta()*(180/3.1415));
+        	hphi_elec_gen.fill(electron_gen.phi()*(180/3.1415));
+        	vW.copy(vBeam);
+        	vW.add(vTarget);
+        	vW.sub(electron);
+        	vQ2.copy(vBeam);
+        	vQ2.sub(electron_gen);
+        	hW_gen.fill(vW.mass());
+        	hQ2_gen.fill(-vQ2.mass2());
+        	hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());   
+     	}
+          	if(pid==2212){
+            	proton_gen.setPxPyPzM(
+              	particles.getFloat("px",i),
+              	particles.getFloat("py",i),
+              	particles.getFloat("pz",i),
+              	0.938
+             	);
+      	hP_pro_gen.fill(proton_gen.p());
+      	htheta_gen.fill(proton_gen.theta()*(180/3.1415));
+      	hphi_gen.fill(proton_gen.phi()*(180/3.1415));
+      	}
+         	v3Parts.setXYZ(
+            	particles.getFloat("px",i),
+            	particles.getFloat("py",i),
+            	particles.getFloat("pz",i) );
+            	pT_gen = Math.sqrt(gen.getFloat("px",i)*gen.getFloat("px",i)+gen.getFloat("py",i)*gen.getFloat("py",i));
+            	hpT_gen.fill(pT_gen);  
+      	hnu_gen.fill(vBeam.e() - electron_gen.e());
+      	hZ_gen.fill(proton_gen.e() / (vBeam.e() - electron_gen.e()));
+      	hY_gen.fill((vBeam.e() - electron_gen.e()) / vBeam.e());
+      	hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e())));
+   	}
+ 	}
+}
+//-------------------------------------------------------------
+// Create acceptance histograms.
+H1F hpT_acc = hpT.histClone("hpT");
+hpT_acc.divide(hpT_gen);
+H1F hW_acc=hW.histClone("hW_acc");
+hW_acc.divide(hW_gen);
+H1F hQ2_acc=hQ2.histClone("hQ2_acc");
+hQ2_acc.divide(hQ2_gen);
+H1F htheta_acc=htheta.histClone("htheta_acc");
+htheta_acc.divide(htheta_gen);
+H1F hphi_acc=hphi.histClone("hphi_acc");
+hphi_acc.divide(hphi_gen);
+H1F htheta_acc_elec=htheta_elec.histClone("htheta_acc_elec");
+htheta_acc_elec.divide(htheta_elec_gen);
+H1F hphi_acc_elec=hphi_elec.histClone("hphi_acc_elec");
+hphi_acc_elec.divide(hphi_elec_gen);
+H1F hP_pro_acc = hP_pro.histClone("hP_pro_acc");
+hP_pro_acc.divide(hP_pro_gen);
+H1F hP_elec_acc = hP_elec.histClone("hP_elec_acc");
+hP_elec_acc.divide(hP_elec_gen);
+H1F hnu_acc=hnu.histClone("hnu_acc");
+hnu_acc.divide(hnu_gen);
+H1F hZ_acc=hZ.histClone("hZ_acc");
+hZ_acc.divide(hZ_gen);
+H1F hY_acc=hY.histClone("hY_acc");
+hY_acc.divide(hY_gen);
+H1F hX_acc=hX.histClone("hX_acc");
+hX_acc.divide(hX_gen);
+//-------------------------------------------------------------
+// Label Acceptance Histograms.
+hY_acc.setTitle("Y Acceptance");
+hZ_acc.setTitle("Z Acceptance");
+hnu_acc.setTitle("#nu Acceptance");
+hP_pro_acc.setTitle("Proton Momentum Acceptance");
+hP_elec_acc.setTitle("Electron Momentum Acceptance");
+hphi_acc_elec.setTitleX("Degrees");
+hphi_acc_elec.setTitle("Acceptance #Phi Electron");
+htheta_acc_elec.setTitleX("Degrees");
+htheta_acc_elec.setTitle("Acceptance #Theta Electron");
+hphi_acc.setTitleX("Degrees");
+hphi_acc.setTitle("Acceptance #Phi Proton");
+htheta_acc.setTitleX("Degrees");
+htheta_acc.setTitle("Acceptance #Theta Proton");
+hQ2_acc.setTitleX("Q^2 [GeV/c^2]");
+hQ2_acc.setTitle("Acceptance Q^2");
+hW_acc.setTitleX("W [GeV]");
+hW_acc.setTitle("Acceptance W");
+hpT_acc.setTitle("Transverse Momentum Acceptance");
+hX_acc.setTitle("X Acceptance");
+//-------------------------------------------------------------
+// Create graphs from histograms to allow error bars.
+GraphErrors gW = new GraphErrors();
+gW = hW.getGraph();
+GraphErrors gW_gen = new GraphErrors();
+gW_gen = hW_gen.getGraph();
+GraphErrors gW_acc = new GraphErrors();
+gW_acc = hW_acc.getGraph();
+GraphErrors gQ2 = new GraphErrors();
+gQ2 = hQ2.getGraph();
+GraphErrors gQ2_gen = new GraphErrors();
+gQ2_gen = hQ2_gen.getGraph();
+GraphErrors gQ2_acc = new GraphErrors();
+gQ2_acc = hQ2_acc.getGraph();
+//-------------------------------------------------------------
+// Label graphs.
+gW.setTitleX("W [GeV]");
+gW.setTitle("Reconstructed W");
+gQ2.setTitleX("Q^2 [GeV/c^2]");
+gQ2.setTitle("Reconstructed Q^2");
+gW_gen.setTitleX("W [GeV]");
+gW_gen.setTitle("Generated W");
+gQ2_gen.setTitleX("Q^2 [GeV/c^2]");
+gQ2_gen.setTitle("Generated Q^2");
+gW_acc.setTitleX("W [GeV]");
+gW_acc.setTitle("Acceptance W");
+gQ2_acc.setTitleX("Q^2 [GeV/c^2]");
+gQ2_acc.setTitle("Acceptance Q^2");
+//-------------------------------------------------------------
+// Divide TCanvases and draw histograms in them.
 REC.divide(2,2);
 REC.cd(0).draw(gW);
 REC.cd(1).draw(gQ2);
 REC.cd(2).draw(hBetaVsPTot);
 REC.cd(3).draw(hQ2vW);
-
 GEN.divide(3,1);
 GEN.cd(0).draw(gW_gen);
 GEN.cd(1).draw(gQ2_gen);
 GEN.cd(2).draw(hQ2vW_gen);
-
 W.divide(1,3);
 W.cd(0).draw(gW);
 W.cd(1).draw(gW_gen);
 W.cd(2).draw(gW_acc);
-
 Q2.divide(1,3);
 Q2.cd(0).draw(gQ2);
 Q2.cd(1).draw(gQ2_gen);
 Q2.cd(2).draw(gQ2_acc);
-
 angles.divide(4,3);
 angles.cd(0).draw(htheta);
 angles.cd(1).draw(hphi);
@@ -430,55 +383,13 @@ angles.cd(6).draw(htheta_elec_gen);
 angles.cd(7).draw(hphi_elec_gen);
 angles.cd(10).draw(htheta_acc_elec);
 angles.cd(11).draw(hphi_acc_elec);
-
-htheta.setFillColor(5);
-htheta_gen.setFillColor(5);
-htheta_acc.setFillColor(5);
-hphi.setFillColor(7);
-hphi_gen.setFillColor(7);
-hphi_acc.setFillColor(7);
-htheta_elec.setFillColor(6);
-htheta_elec_gen.setFillColor(6);
-htheta_acc_elec.setFillColor(6);
-hphi_elec.setFillColor(2);
-hphi_elec_gen.setFillColor(2);
-hphi_acc_elec.setFillColor(2);
-
-hnu.setFillColor(3);
-hnu_gen.setFillColor(3);
-hnu_acc.setFillColor(3);
-hZ.setFillColor(8);
-hZ_gen.setFillColor(8);
-hZ_acc.setFillColor(8);
-hY.setFillColor(4);
-hY_gen.setFillColor(4);
-hY_acc.setFillColor(4);
-hX.setFillColor(9);
-hX_gen.setFillColor(9);
-hX_acc.setFillColor(9);
-
 Tbeta.divide(1,3);
 Tbeta.cd(0).draw(hbeta);
 Tbeta.cd(1).draw(hbeta_calc);
 Tbeta.cd(2).draw(hdeltabeta);
-
 deltaBvPTot.divide(2,1);
 deltaBvPTot.cd(0).draw(hdeltabetavPTot);
 deltaBvPTot.cd(1).draw(hdeltabeta_provPTot);
-
-gW.setMarkerSize(2);
-gW_gen.setMarkerSize(2);
-gW_acc.setMarkerSize(2);
-gQ2.setMarkerSize(2);
-gQ2_gen.setMarkerSize(2);
-gQ2_acc.setMarkerSize(2);
-gW.setLineColor(2);
-gW_gen.setLineColor(2);
-gW_acc.setLineColor(2);
-gQ2.setLineColor(2);
-gQ2_gen.setLineColor(2);
-gQ2_acc.setLineColor(2);
-
 P.divide(2,3);
 P.cd(0).draw(hP_pro);
 P.cd(1).draw(hP_elec);
@@ -486,19 +397,10 @@ P.cd(2).draw(hP_pro_gen);
 P.cd(3).draw(hP_elec_gen);
 P.cd(4).draw(hP_pro_acc);
 P.cd(5).draw(hP_elec_acc);
-
-hP_pro.setFillColor(8);
-hP_pro_gen.setFillColor(8);
-hP_pro_acc.setFillColor(8);
-hP_elec.setFillColor(9);
-hP_elec_gen.setFillColor(9);
-hP_elec_acc.setFillColor(9);
-
 Transverse_P.divide(1,3);
 Transverse_P.cd(0).draw(hpT);
 Transverse_P.cd(1).draw(hpT_gen);
 Transverse_P.cd(2).draw(hpT_acc);
-
 Mandelstam.divide(4,3);
 Mandelstam.cd(0).draw(hnu);
 Mandelstam.cd(1).draw(hZ);
@@ -512,12 +414,55 @@ Mandelstam.cd(8).draw(hnu_acc);
 Mandelstam.cd(9).draw(hZ_acc);
 Mandelstam.cd(10).draw(hY_acc);
 Mandelstam.cd(11).draw(hX_acc);
+//-------------------------------------------------------------
+// Make everything pretty.
+gW.setMarkerSize(2);
+gW_gen.setMarkerSize(2);
+gW_acc.setMarkerSize(2);
+gQ2.setMarkerSize(2);
+gQ2_gen.setMarkerSize(2);
+gQ2_acc.setMarkerSize(2);
+gW.setLineColor(2);
+gW_gen.setLineColor(2);
+gW_acc.setLineColor(2);
+gQ2.setLineColor(2);
+gQ2_gen.setLineColor(2);
+gQ2_acc.setLineColor(2);
+hP_pro.setFillColor(8);
+hP_pro_gen.setFillColor(8);
+hP_pro_acc.setFillColor(8);
+hP_elec.setFillColor(9);
+hP_elec_gen.setFillColor(9);
+hP_elec_acc.setFillColor(9);
+htheta.setFillColor(5);
+htheta_gen.setFillColor(5);
+htheta_acc.setFillColor(5);
+hphi.setFillColor(7);
+hphi_gen.setFillColor(7);
+hphi_acc.setFillColor(7);
+htheta_elec.setFillColor(6);
+htheta_elec_gen.setFillColor(6);
+htheta_acc_elec.setFillColor(6);
+hphi_elec.setFillColor(2);
+hphi_elec_gen.setFillColor(2);
+hphi_acc_elec.setFillColor(2);
+hnu.setFillColor(3);
+hnu_gen.setFillColor(3);
+hnu_acc.setFillColor(3);
+hZ.setFillColor(8);
+hZ_gen.setFillColor(8);
+hZ_acc.setFillColor(8);
+hY.setFillColor(4);
+hY_gen.setFillColor(4);
+hY_acc.setFillColor(4);
+hX.setFillColor(9);
+hX_gen.setFillColor(9);
+hX_acc.setFillColor(9);
+//-------------------------------------------------------------
 
 //TDirectory dir = new TDirectory();
 //dir.mkdir("/prosearch");
 //dir.cd("prosearch");
-
- 
 // dir.addDataSet(hW);  
 // dir.addDataSet(hW_gen);
 // dir.addDataSet(hW_acc);
@@ -527,6 +472,8 @@ Mandelstam.cd(11).draw(hX_acc);
 // dir.addDataSet(hQ2vW);
 // dir.addDataSet(hBetaVsPTot);
 // String histFile = "myfile.hipo";  // declare the output file name
-// dir.writeFile(histFile);          // write the file
+// dir.writeFile(histFile);      	// write the file
+
+
 
 
