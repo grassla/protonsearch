@@ -147,7 +147,7 @@ LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
 LorentzVector electron_gen = new LorentzVector();
-LorentzVector proton = new LorentzVector(); 
+// LorentzVector proton = new LorentzVector(); 
 LorentzVector proton_gen = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
@@ -162,6 +162,8 @@ reader.getEvent(event,0);
 while(reader.hasNext()==true){
      reader.nextEvent(event);
      event.read(particles);
+     Particle Proton = physEvent.getParticle("2212");
+     Particle Electron = physEvent.getParticle("11");
      if(all.isValid(physEvent)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
@@ -181,21 +183,35 @@ while(reader.hasNext()==true){
               hdeltabeta.fill(deltabeta); 
               hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
               
-              if(pid == 2212){                                // comment this out to see other particles           
+              if(only_pro.isValid(physEvent)==true){                                // comment this out to see other particles           
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
                  hP_pro.fill(v3Parts.mag()); 
-                 hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); }
-             if(pid ==11){
-                 hP_elec.fill(v3Parts.mag()); }
-        }                                                   // also comment this out for other particles
+                 hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); 
 
+                LorentzVector pro_L = physEvent.getParticle("[2212]").vector();
+                pro_L.setPxPyPzM(
+                  particles.getFloat("px",i), 
+                  particles.getFloat("py",i),
+                  particles.getFloat("pz",i),
+                  0.938
+                 );
+          htheta.fill(pro_L.theta()*(180/3.1415));
+          hphi.fill(pro_L.phi()*(180/3.1415));
+       // take below out of pro loop?
 
-//----------------------------------------
-//----------------------------------------
-//----------------------------------------
-//change some methods to rid of lorentzvectors
+          hnu.fill(vBeam.e() - electron.e());
+          hZ.fill(pro_L.e() / (vBeam.e() - electron.e()));
+          hY.fill((vBeam.e() - electron.e()) / vBeam.e());
+          hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e()))); 
+          } // also comment this out for other particles
+          }
+          
+
+                                                          
+
 
           if(only_elec.isValid(physEvent)==true){
+             hP_elec.fill(v3Parts.mag());
              electron.setPxPyPzM(
                  particles.getFloat("px",i), 
                   particles.getFloat("py",i),
@@ -211,24 +227,12 @@ while(reader.hasNext()==true){
             vQ2.sub(electron); 
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
-            hQ2vW.fill(vW.mass(),-vQ2.mass2());
-         }
-          if(only_pro.isValid(physEvent)==true){
-                proton.setPxPyPzM(
-                  particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.938
-                 ); 
-          htheta.fill(proton.theta()*(180/3.1415));
-          hphi.fill(proton.phi()*(180/3.1415));
-          }
-          hnu.fill(vBeam.e() - electron.e());
-          hZ.fill(proton.e() / (vBeam.e() - electron.e()));
-          hY.fill((vBeam.e() - electron.e()) / vBeam.e());
-          hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e())));
+            hQ2vW.fill(vW.mass(),-vQ2.mass2()); }
+         
        }
      }
+
+
 //---------------------------------------------------------------------
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
