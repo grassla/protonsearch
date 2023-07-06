@@ -182,11 +182,22 @@ while(reader.hasNext()==true){ //not this pull one event
               hbeta_calc.fill(beta_calc);
               hdeltabeta.fill(deltabeta); 
               hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
-              
-              if(only_pro.isValid(physEvent)==true){                                // comment this out to see other particles           
+              }
+          }
+     }
+     if(only_pro.isValid(physEvent)==true){                                // comment this out to see other particles           
+          for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
+          if(particles.getFloat("beta", i)>0){
+             v3Parts.setXYZ(
+                particles.getFloat("px",i), 
+                particles.getFloat("py",i),
+                particles.getFloat("pz",i) );
+
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
                  hP_pro.fill(v3Parts.mag()); 
                  hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); 
+
 
                 LorentzVector pro_L = physEvent.getParticle("[2212]").vector();
                 pro_L.setPxPyPzM(
@@ -205,12 +216,17 @@ while(reader.hasNext()==true){ //not this pull one event
           hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e()))); 
           } // also comment this out for other particles
           }
+          }
           
 
-                                                          
-
-
           if(only_elec.isValid(physEvent)==true){
+          for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
+          if(particles.getFloat("beta", i)>0){
+             v3Parts.setXYZ(
+                particles.getFloat("px",i), 
+                particles.getFloat("py",i),
+                particles.getFloat("pz",i) );
              hP_elec.fill(v3Parts.mag());
              electron.setPxPyPzM(
                  particles.getFloat("px",i), 
@@ -229,8 +245,9 @@ while(reader.hasNext()==true){ //not this pull one event
             hQ2.fill(-vQ2.mass2());
             hQ2vW.fill(vW.mass(),-vQ2.mass2()); }
          
-       }
+       } //here
      }
+
 
 
 //---------------------------------------------------------------------
