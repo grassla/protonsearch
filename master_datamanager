@@ -254,9 +254,9 @@ while(reader.hasNext()==true){ //not this pull one event
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
      if(gen.getRows()>0){
-        for(int i = 0; i < gen.getRows(); i++) {
-          int pid = gen.getInt("pid",i);
-            if(pid==11){
+      if(only_elec.isValid(physEvent)==true){
+          for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
              electron_gen.setPxPyPzM(
                   gen.getFloat("px",i), 
                   gen.getFloat("py",i),
@@ -275,7 +275,10 @@ while(reader.hasNext()==true){ //not this pull one event
             hQ2_gen.fill(-vQ2.mass2());
             hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());   
          }
-              if(pid==2212){
+     }
+       if(only_pro.isValid(physEvent)==true){
+          for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
                 proton_gen.setPxPyPzM(
                   particles.getFloat("px",i), 
                   particles.getFloat("py",i),
@@ -286,6 +289,10 @@ while(reader.hasNext()==true){ //not this pull one event
           htheta_gen.fill(proton_gen.theta()*(180/3.1415));
           hphi_gen.fill(proton_gen.phi()*(180/3.1415));
           }
+     }
+      if(all.isValid(physEvent)==true){
+          for(int i = 0; i < particles.getRows(); i++) {
+          int pid = particles.getInt("pid",i);
              v3Parts.setXYZ(
                 particles.getFloat("px",i), 
                 particles.getFloat("py",i),
@@ -298,6 +305,7 @@ while(reader.hasNext()==true){ //not this pull one event
           hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e())));
        }
      }
+}
 }
 //-------------------------------------------------------------
 // Create acceptance histograms.
