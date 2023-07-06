@@ -159,7 +159,7 @@ EventFilter  all = new EventFilter("X+:X-:Xn");
 EventFilter  only_elec = new EventFilter("11:X+:X-:Xn");
 EventFilter  only_pro = new EventFilter("2212:X+:X-:Xn");
 reader.getEvent(event,0);  
-while(reader.hasNext()==true){
+while(reader.hasNext()==true){ //not this pull one event
      reader.nextEvent(event);
      event.read(particles);
      Particle Proton = physEvent.getParticle("2212");
