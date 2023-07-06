@@ -147,13 +147,12 @@ LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
 LorentzVector electron = new LorentzVector(); 
 LorentzVector electron_gen = new LorentzVector();
-// LorentzVector proton = new LorentzVector(); 
+
 LorentzVector proton_gen = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
 //---------------------------------------------------------------------
-PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
 // Loop through events from Reconstructed bank and fill histograms.
 EventFilter  all = new EventFilter("X+:X-:Xn");
 EventFilter  only_elec = new EventFilter("11:X+:X-:Xn");
@@ -162,6 +161,7 @@ reader.getEvent(event,0);
 while(reader.hasNext()==true){ //not this pull one event
      reader.nextEvent(event);
      event.read(particles);
+     PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
      Particle Proton = physEvent.getParticle("2212");
      Particle Electron = physEvent.getParticle("11");
      if(all.isValid(physEvent)==true){
@@ -197,17 +197,11 @@ while(reader.hasNext()==true){ //not this pull one event
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
                  hP_pro.fill(v3Parts.mag()); 
                  hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); 
+                 LorentzVector pro_L = physEvent.getParticle("[2212]").vector();
+                 htheta.fill(pro_L.theta()*(180/3.1415));
+                 hphi.fill(pro_L.phi()*(180/3.1415));
 
 
-                LorentzVector pro_L = physEvent.getParticle("[2212]").vector();
-                pro_L.setPxPyPzM(
-                  particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.938
-                 );
-          htheta.fill(pro_L.theta()*(180/3.1415));
-          hphi.fill(pro_L.phi()*(180/3.1415));
        // take below out of pro loop?
 
           hnu.fill(vBeam.e() - electron.e());
@@ -228,19 +222,14 @@ while(reader.hasNext()==true){ //not this pull one event
                 particles.getFloat("py",i),
                 particles.getFloat("pz",i) );
              hP_elec.fill(v3Parts.mag());
-             electron.setPxPyPzM(
-                 particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.0005
-                 );  
-            htheta_elec.fill(electron.theta()*(180/3.1415));
-            hphi_elec.fill(electron.phi()*(180/3.1415));
+          LorentzVector electron0 = physEvent.getParticle("[11]").vector();
+            htheta_elec.fill(electron0.theta()*(180/3.1415));
+            hphi_elec.fill(electron0.phi()*(180/3.1415));
             vW.copy(vBeam);
             vW.add(vTarget);
-            vW.sub(electron);
+            vW.sub(electron0);
             vQ2.copy(vBeam);
-            vQ2.sub(electron); 
+            vQ2.sub(electron0); 
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
             hQ2vW.fill(vW.mass(),-vQ2.mass2()); }
@@ -253,8 +242,9 @@ while(reader.hasNext()==true){ //not this pull one event
 //---------------------------------------------------------------------
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
+     PhysicsEvent physEvent0 = DataManager.getPhysicsEvent(10.6,gen);
      if(gen.getRows()>0){
-      if(only_elec.isValid(physEvent)==true){
+      if(only_elec.isValid(physEvent0)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
              electron_gen.setPxPyPzM(
@@ -276,7 +266,7 @@ while(reader.hasNext()==true){ //not this pull one event
             hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());   
          }
      }
-       if(only_pro.isValid(physEvent)==true){
+       if(only_pro.isValid(physEvent0)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
                 proton_gen.setPxPyPzM(
@@ -290,7 +280,7 @@ while(reader.hasNext()==true){ //not this pull one event
           hphi_gen.fill(proton_gen.phi()*(180/3.1415));
           }
      }
-      if(all.isValid(physEvent)==true){
+      if(all.isValid(physEvent0)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
              v3Parts.setXYZ(
