@@ -145,10 +145,10 @@ int num_events_count = 0;
 // Create 3- and 4-Vectors.
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
 LorentzVector  vTarget = new LorentzVector(0.0,0.0,0.0,0.938);
-LorentzVector electron = new LorentzVector(); 
-LorentzVector electron_gen = new LorentzVector();
+// LorentzVector electron = new LorentzVector(); 
+// LorentzVector electron_gen = new LorentzVector();
 
-LorentzVector proton_gen = new LorentzVector(); 
+// LorentzVector proton_gen = new LorentzVector(); 
 LorentzVector       vW = new LorentzVector(); 
 LorentzVector      vQ2 = new LorentzVector();
 Vector3 v3Parts   = new Vector3(0.0,0.0,0.0);
@@ -163,7 +163,9 @@ while(reader.hasNext()==true){ //not this pull one event
      event.read(particles);
      PhysicsEvent physEvent = DataManager.getPhysicsEvent(10.6,particles);
      Particle Proton = physEvent.getParticle("2212");
+     LorentzVector proton = physEvent.getParticle("[2212]").vector();
      Particle Electron = physEvent.getParticle("11");
+     LorentzVector electron = physEvent.getParticle("[11]").vector();
      if(all.isValid(physEvent)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
@@ -182,104 +184,50 @@ while(reader.hasNext()==true){ //not this pull one event
               hbeta_calc.fill(beta_calc);
               hdeltabeta.fill(deltabeta); 
               hdeltabetavPTot.fill(v3Parts.mag(),deltabeta);
-              }
-          }
-     }
-     if(only_pro.isValid(physEvent)==true){                                // comment this out to see other particles           
-          for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-          if(particles.getFloat("beta", i)>0){
-             v3Parts.setXYZ(
-                particles.getFloat("px",i), 
-                particles.getFloat("py",i),
-                particles.getFloat("pz",i) );
 
+     if(only_pro.isValid(physEvent)==true){                                // comment this out to see other particles           
                  hBetaVsPTot.fill(v3Parts.mag(),particles.getFloat("beta",i)); 
                  hP_pro.fill(v3Parts.mag()); 
                  hdeltabeta_provPTot.fill(v3Parts.mag(),deltabeta_pro); 
-                 LorentzVector pro_L = physEvent.getParticle("[2212]").vector();
-                 htheta.fill(pro_L.theta()*(180/3.1415));
-                 hphi.fill(pro_L.phi()*(180/3.1415));
+                 // LorentzVector proton = physEvent.getParticle("[2212]").vector();
+                 htheta.fill(proton.theta()*(180/3.1415));
+                 hphi.fill(proton.phi()*(180/3.1415)); } // also comment this out for other particles
 
 
        // take below out of pro loop?
 
           hnu.fill(vBeam.e() - electron.e());
-          hZ.fill(pro_L.e() / (vBeam.e() - electron.e()));
+          hZ.fill(proton.e() / (vBeam.e() - electron.e()));
           hY.fill((vBeam.e() - electron.e()) / vBeam.e());
           hX.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron.e()))); 
-          } // also comment this out for other particles
-          }
-          }
           
-
           if(only_elec.isValid(physEvent)==true){
-          for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-          if(particles.getFloat("beta", i)>0){
-             v3Parts.setXYZ(
-                particles.getFloat("px",i), 
-                particles.getFloat("py",i),
-                particles.getFloat("pz",i) );
-             hP_elec.fill(v3Parts.mag());
-          LorentzVector electron0 = physEvent.getParticle("[11]").vector();
-            htheta_elec.fill(electron0.theta()*(180/3.1415));
-            hphi_elec.fill(electron0.phi()*(180/3.1415));
+            hP_elec.fill(v3Parts.mag());
+            // LorentzVector electron0 = physEvent.getParticle("[11]").vector();
+            htheta_elec.fill(electron.theta()*(180/3.1415));
+            hphi_elec.fill(electron.phi()*(180/3.1415));
             vW.copy(vBeam);
             vW.add(vTarget);
-            vW.sub(electron0);
+            vW.sub(electron);
             vQ2.copy(vBeam);
-            vQ2.sub(electron0); 
+            vQ2.sub(electron); 
             hW.fill(vW.mass());
             hQ2.fill(-vQ2.mass2());
             hQ2vW.fill(vW.mass(),-vQ2.mass2()); }
          
-       } //here
+       } 
      }
-
+   }
 
 
 //---------------------------------------------------------------------
 // Loop through events from Generated bank and fill histograms.
      event.read(gen);
+     LorentzVector electron_gen = physEvent.getParticle("[11]").vector();
+     LorentzVector proton_gen = physEvent.getParticle("[2212]").vector();
      PhysicsEvent physEvent0 = DataManager.getPhysicsEvent(10.6,gen);
      if(gen.getRows()>0){
-      if(only_elec.isValid(physEvent0)==true){
-          for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-             electron_gen.setPxPyPzM(
-                  gen.getFloat("px",i), 
-                  gen.getFloat("py",i),
-                  gen.getFloat("pz",i),
-                  0.0005
-                 );
-            hP_elec_gen.fill(electron_gen.p());
-            htheta_elec_gen.fill(electron_gen.theta()*(180/3.1415));
-            hphi_elec_gen.fill(electron_gen.phi()*(180/3.1415)); 
-            vW.copy(vBeam);
-            vW.add(vTarget);
-            vW.sub(electron);
-            vQ2.copy(vBeam);
-            vQ2.sub(electron_gen);
-            hW_gen.fill(vW.mass());
-            hQ2_gen.fill(-vQ2.mass2());
-            hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());   
-         }
-     }
-       if(only_pro.isValid(physEvent0)==true){
-          for(int i = 0; i < particles.getRows(); i++) {
-          int pid = particles.getInt("pid",i);
-                proton_gen.setPxPyPzM(
-                  particles.getFloat("px",i), 
-                  particles.getFloat("py",i),
-                  particles.getFloat("pz",i),
-                  0.938
-                 ); 
-          hP_pro_gen.fill(proton_gen.p());
-          htheta_gen.fill(proton_gen.theta()*(180/3.1415));
-          hphi_gen.fill(proton_gen.phi()*(180/3.1415));
-          }
-     }
+
       if(all.isValid(physEvent0)==true){
           for(int i = 0; i < particles.getRows(); i++) {
           int pid = particles.getInt("pid",i);
@@ -292,10 +240,28 @@ while(reader.hasNext()==true){ //not this pull one event
           hnu_gen.fill(vBeam.e() - electron_gen.e());
           hZ_gen.fill(proton_gen.e() / (vBeam.e() - electron_gen.e()));
           hY_gen.fill((vBeam.e() - electron_gen.e()) / vBeam.e());
-          hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e())));
-       }
+          hX_gen.fill(-vQ2.mass2() / (2 * 0.938 * (vBeam.e() - electron_gen.e()))); 
+
+      if(only_elec.isValid(physEvent0)==true){      
+            hP_elec_gen.fill(electron_gen.p());
+            htheta_elec_gen.fill(electron_gen.theta()*(180/3.1415));
+            hphi_elec_gen.fill(electron_gen.phi()*(180/3.1415)); 
+            vW.copy(vBeam);
+            vW.add(vTarget);
+            vW.sub(electron);
+            vQ2.copy(vBeam);
+            vQ2.sub(electron_gen);
+            hW_gen.fill(vW.mass());
+            hQ2_gen.fill(-vQ2.mass2());
+            hQ2vW_gen.fill(vW.mass(),-vQ2.mass2());   }
+
+       if(only_pro.isValid(physEvent0)==true){
+          hP_pro_gen.fill(proton_gen.p());
+          htheta_gen.fill(proton_gen.theta()*(180/3.1415));
+          hphi_gen.fill(proton_gen.phi()*(180/3.1415)); }
+          }
      }
-}
+  }
 }
 //-------------------------------------------------------------
 // Create acceptance histograms.
