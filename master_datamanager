@@ -126,21 +126,12 @@ TCanvas Transverse_P = new TCanvas("Transverse_P" ,300,900);
 TCanvas Mandelstam = new TCanvas("Mandelstam", 400,400);
 //---------------------------------------------------------------------
 // Create variables.
-int counter = 0;
-int elec = 0;
-int pro = 0;
-int event_elec = 0;
-int event_pro = 0;
 double beta_calc = 0;
 double deltabeta = 0;
 double deltabeta_pro = 0;
 double p = 0;
 double pT = 0;
 double pT_gen = 0;
-int num_events = 0;
-int num_events_count = 0; 
-
-
 //---------------------------------------------------------------------
 // Create 3- and 4-Vectors.
 LorentzVector  vBeam   = new LorentzVector(0.0,0.0,10.6,10.6);
